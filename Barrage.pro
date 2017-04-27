@@ -4,13 +4,14 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Barrage
 TEMPLATE = app
 
+INCLUDEPATH += qtsingle/
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -22,7 +23,12 @@ SOURCES += main.cpp\
     qexpressionlabel.cpp \
     cmousemonitorwidget.cpp \
     csignalbarragescreen.cpp \
-    cmovepath.cpp
+    cmovepath.cpp \
+    qtsingle/qtlocalpeer.cpp \
+    qtsingle/qtlockedfile.cpp \
+    qtsingle/qtlockedfile_win.cpp \
+    qtsingle/qtsingleapplication.cpp \
+    qtsingle/qtsinglecoreapplication.cpp
 
 HEADERS  += mainwindow.h \
     cbarrageitem.h \
@@ -33,7 +39,11 @@ HEADERS  += mainwindow.h \
     qexpressionlabel.h \
     cmousemonitorwidget.h \
     csignalbarragescreen.h \
-    cmovepath.h
+    cmovepath.h \
+    qtsingle/qtlocalpeer.h \
+    qtsingle/qtlockedfile.h \
+    qtsingle/qtsingleapplication.h \
+    qtsingle/qtsinglecoreapplication.h
 
 FORMS += \
     mainwindow.ui

@@ -1,9 +1,13 @@
 ﻿#include "mainwindow.h"
-#include <QApplication>
+#include "qtsingleapplication.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QtSingleApplication a(argc, argv);
+    if (a.sendMessage("Wake"))
+    {
+        return 0;
+    }
     a.setQuitOnLastWindowClosed(false);
     MainWindow w;
     w.show();
