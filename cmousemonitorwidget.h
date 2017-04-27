@@ -13,6 +13,7 @@ public:
     static void startMouseMonitor();
     static void stopMouseMonitor();
     static void setCurrentInstance(CMouseMonitorWidget *widget);
+    static void closeAllWidget();
 
 public slots:
     virtual void clicked(QPoint point) = 0;

@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     cemoticonwidget.cpp \
     qexpressionlabel.cpp \
     cmousemonitorwidget.cpp \
-    csignalbarragescreen.cpp
+    csignalbarragescreen.cpp \
+    cmovepath.cpp
 
 HEADERS  += mainwindow.h \
     cbarrageitem.h \
@@ -31,7 +32,8 @@ HEADERS  += mainwindow.h \
     cemoticonwidget.h \
     qexpressionlabel.h \
     cmousemonitorwidget.h \
-    csignalbarragescreen.h
+    csignalbarragescreen.h \
+    cmovepath.h
 
 FORMS += \
     mainwindow.ui

@@ -1,6 +1,9 @@
 ﻿#include "systemtray.h"
 #include "cbarragescreen.h"
 #include <QTime>
+#include <QAction>
+#include <QApplication>
+#include <QMenu>
 #include "csignalbarragescreen.h"
 #include "mainwindow.h"
 
@@ -27,7 +30,7 @@ void test()
 SystemTray::SystemTray(QWidget *parent)
     : QSystemTrayIcon(parent)
 {
-    createAction();
+    InitTyay();
     test();
 }
 
@@ -35,13 +38,18 @@ SystemTray::~SystemTray()
 {
 
 }
-void SystemTray::createAction()
+void SystemTray::InitTyay()
 {
-    quitAction = new QAction(QStringLiteral("不要我了。。。"),this);
-    myMenu = new QMenu();
+    QMenu *myMenu = new QMenu();
+    QAction *closeBarrageScreen = new QAction(QStringLiteral("关闭弹幕窗口"),this);
+    closeBarrageScreen->setCheckable(true);
+    closeBarrageScreen->setChecked(!CBarrageScreen::getScreen()->isHidden());
+    connect(closeBarrageScreen, SIGNAL(triggered()), this, SLOT(hideBarrageScreen()));
 
-    this->setIcon(QIcon(":/send.ico"));
-    this->setToolTip(QStringLiteral("给你惊喜！！！"));
+    QAction *closeAllAnimations = new QAction(QStringLiteral("关闭所有动画"),this);
+    connect(closeAllAnimations, SIGNAL(triggered()), this, SLOT(closeAllAnimation()));
+
+    QAction *quitAction = new QAction(QStringLiteral("不要我了。。。(退出)"),this);
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(this,
@@ -49,8 +57,23 @@ void SystemTray::createAction()
             this,
             SLOT(SystemTrayActivated(QSystemTrayIcon::ActivationReason)));
 
+    myMenu->addAction(closeBarrageScreen);
+    myMenu->addAction(closeAllAnimations);
     myMenu->addAction(quitAction);
     this->setContextMenu(myMenu);
+
+    this->setIcon(QIcon(":/send.ico"));
+    this->setToolTip(QStringLiteral("给你惊喜！！！"));
+}
+
+void SystemTray::hideBarrageScreen()
+{
+    CBarrageScreen::getScreen()->setHidden(!CBarrageScreen::getScreen()->isHidden());
+}
+
+void SystemTray::closeAllAnimation()
+{
+    CSignalBarrageScreen::closeAllWidget();
 }
 
 void SystemTray::ShowParent()

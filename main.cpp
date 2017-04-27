@@ -7,6 +7,5 @@ int main(int argc, char *argv[])
     a.setQuitOnLastWindowClosed(false);
     MainWindow w;
     w.show();
-
     return a.exec();
 }

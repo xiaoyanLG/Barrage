@@ -3,13 +3,18 @@
 
 #include "cmousemonitorwidget.h"
 #include "cbarrageitem.h"
+#include "cmovepath.h"
 
 class CSignalBarrageScreen : public CMouseMonitorWidget
 {
     Q_OBJECT
+    Q_PROPERTY(qreal step READ step WRITE setStep)
 public:
     explicit CSignalBarrageScreen(CBarrageItem *item = NULL, QWidget *parent = 0);
     ~CSignalBarrageScreen();
+
+    qreal step() const;
+    void setStep(qreal step);
 
 public slots:
     void setItem(CBarrageItem *item);
@@ -30,7 +35,10 @@ public slots:
 
 private:
     QPropertyAnimation *mopMoveAnimation;
+    QPropertyAnimation *mopStepAnimation;
     CBarrageItem *mopContentsItem;
+    CMovePath     moMovePath;
+    qreal         mfStep;
 
     bool          mbFixed;
     int           miRefreshTimer;

@@ -2,9 +2,6 @@
 #define SYSTEMTRAY_H
 
 #include <QSystemTrayIcon>
-#include <QAction>
-#include <QApplication>
-#include <QMenu>
 
 class SystemTray : public QSystemTrayIcon
 {
@@ -12,13 +9,11 @@ class SystemTray : public QSystemTrayIcon
 public:
     explicit SystemTray(QWidget *parent = 0);
     ~SystemTray();
-    void createAction();
-
-private:
-    QMenu *myMenu;//托盘菜单
-    QAction *quitAction;//退出
+    void InitTyay();
 
 private slots:
+    void hideBarrageScreen();
+    void closeAllAnimation();
     void ShowParent();
     void SystemTrayActivated(QSystemTrayIcon::ActivationReason reason);//处理点击托盘操作
 

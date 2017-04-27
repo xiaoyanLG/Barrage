@@ -19,6 +19,7 @@ CSignalBarrageScreen::CSignalBarrageScreen(CBarrageItem *item, QWidget *parent)
     mbFixed = false;
     mbAutoMove = false;
     mopMoveAnimation = NULL;
+    mopStepAnimation = NULL;
     mopContentsItem = NULL;
     miMoveAutoTimer = 0;
     setItem(item);
@@ -28,6 +29,38 @@ CSignalBarrageScreen::CSignalBarrageScreen(CBarrageItem *item, QWidget *parent)
 CSignalBarrageScreen::~CSignalBarrageScreen()
 {
     delete mopContentsItem;
+}
+
+qreal CSignalBarrageScreen::step() const
+{
+    return mfStep;
+}
+
+void CSignalBarrageScreen::setStep(qreal step)
+{
+    if (mfStep != step)
+    {
+        mfStep = step;
+        QPoint point = moMovePath.getPoint(step);
+        if (point.x() > QApplication::desktop()->width() - 50)
+        {
+            point.setX(QApplication::desktop()->width() - 50);
+        }
+        else if (point.x() < 0)
+        {
+            point.setX(0);
+        }
+
+        if (point.y() > QApplication::desktop()->height() - 100)
+        {
+            point.setY(QApplication::desktop()->height() - 100);
+        }
+        else if (point.y() < 0)
+        {
+            point.setY(0);
+        }
+        move(point);
+    }
 }
 
 void CSignalBarrageScreen::setItem(CBarrageItem *item)
@@ -143,7 +176,7 @@ void CSignalBarrageScreen::changeAutoMove()
     {
         if (miMoveAutoTimer == 0)
         {
-            miMoveAutoTimer = startTimer(5000);
+            miMoveAutoTimer = startTimer(7000);
         }
     }
     else
@@ -156,20 +189,48 @@ void CSignalBarrageScreen::changeAutoMove()
 void CSignalBarrageScreen::moveNextPoint()
 {
     qsrand(QTime::currentTime().msecsTo(QTime(0, 0)) + (int)this);
-    if (mopMoveAnimation == NULL)
+    if (mopStepAnimation == NULL)
     {
-        mopMoveAnimation = new QPropertyAnimation(this, "pos");
-    }
-    else
-    {
-        mopMoveAnimation->stop();
+        mopStepAnimation = new QPropertyAnimation(this, "step");
     }
 
-    mopMoveAnimation->setEndValue(QPoint(qrand() % QApplication::desktop()->width(),
-                                         qrand() % QApplication::desktop()->height()));
-    mopMoveAnimation->setDuration(5000);
-    mopMoveAnimation->setEasingCurve(QEasingCurve::Type(qrand() % 40));
-    mopMoveAnimation->start();
+    // 随机产生轨迹
+    {
+        int index = qrand() % 4;
+        QPoint curpos = pos();
+        switch (index)
+        {
+        case 0:
+            moMovePath.setLine(curpos, QPoint(qrand() % QApplication::desktop()->width(),
+                                             qrand() % QApplication::desktop()->height()));
+            break;
+        case 1:
+            moMovePath.setCurve(curpos, QPoint(qrand() % QApplication::desktop()->width(),
+                                             qrand() % QApplication::desktop()->height()));
+            break;
+        case 2:
+            moMovePath.setTrigon(curpos, QPoint(qrand() % QApplication::desktop()->width(),
+                                                qrand() % QApplication::desktop()->height())
+                                 , QPoint(qrand() % QApplication::desktop()->width(),
+                                          qrand() % QApplication::desktop()->height()));
+            break;
+        case 3:
+            moMovePath.setRect(curpos, QPoint(curpos.x() + qrand() % 1000 - 500,
+                                              curpos.y() + qrand() % 1000 - 500));
+            break;
+        case 4:
+            moMovePath.setCentre(curpos, QPoint(curpos.x() + qrand() % 1000 - 500,
+                                                curpos.y() + qrand() % 1000 - 500));
+            break;
+        }
+    }
+
+    mopStepAnimation->stop();
+    mopStepAnimation->setStartValue(0);
+    mopStepAnimation->setEndValue(1);
+    mopStepAnimation->setDuration(qrand()%5 * 1000 + 5000);
+    mopStepAnimation->setEasingCurve(QEasingCurve::Type(qrand() % 40));
+    mopStepAnimation->start();
 }
 
 void CSignalBarrageScreen::paintEvent(QPaintEvent *event)
@@ -274,7 +335,7 @@ void CSignalBarrageScreen::timerEvent(QTimerEvent *event)
     }
     else if (miMoveAutoTimer == event->timerId())
     {
-        if (!mbFixed)
+        if (!mbFixed && !mbLeftMousePressed)
         {
             moveNextPoint();
         }
@@ -289,6 +350,10 @@ void CSignalBarrageScreen::mousePressEvent(QMouseEvent *event)
         if (mopMoveAnimation && mopMoveAnimation->state() == QPropertyAnimation::Running)
         {
             mopMoveAnimation->stop();
+        }
+        if (mopStepAnimation && mopStepAnimation->state() == QPropertyAnimation::Running)
+        {
+            mopStepAnimation->stop();
         }
         mbLeftMousePressed = true;
         moLastPos = event->globalPos();
@@ -348,7 +413,7 @@ void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
 
 void CSignalBarrageScreen::clicked(QPoint point)
 {
-    if (!mbLeftMousePressed && !mbFixed)
+    if (!mbLeftMousePressed && !mbFixed && !mbAutoMove)
     {
         qsrand(QTime::currentTime().msecsTo(QTime(0, 0)) + (int)this);
         if (mopMoveAnimation == NULL)

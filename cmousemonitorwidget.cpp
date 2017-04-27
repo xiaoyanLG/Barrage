@@ -45,6 +45,16 @@ void CMouseMonitorWidget::setCurrentInstance(CMouseMonitorWidget *widget)
     instance = widget;
 }
 
+void CMouseMonitorWidget::closeAllWidget()
+{
+    instance = NULL;
+    while (!mlistAllWidget.isEmpty())
+    {
+        delete mlistAllWidget.at(0);
+    }
+    stopMouseMonitor();
+}
+
 void CMouseMonitorWidget::changeRandomCall()
 {
     mbRandomCall = !mbRandomCall;
