@@ -196,7 +196,7 @@ void CSignalBarrageScreen::moveNextPoint()
 
     // 随机产生轨迹
     {
-        int index = qrand() % 4;
+        int index = qrand() % 5;
         QPoint curpos = pos();
         switch (index)
         {

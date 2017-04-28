@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     qtsingle/qtlockedfile.cpp \
     qtsingle/qtlockedfile_win.cpp \
     qtsingle/qtsingleapplication.cpp \
-    qtsingle/qtsinglecoreapplication.cpp
+    qtsingle/qtsinglecoreapplication.cpp \
+    qtsingle/qtlockedfile_unix.cpp
 
 HEADERS  += mainwindow.h \
     cbarrageitem.h \
