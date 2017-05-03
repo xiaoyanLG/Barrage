@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QLibrary>
+#include <Windows.h>
 
 CBarrageScreen *CBarrageScreen::mopInstance = NULL;
 CBarrageScreen::CBarrageScreen(QWidget *parent) : QWidget(parent)
@@ -19,6 +20,8 @@ CBarrageScreen::CBarrageScreen(QWidget *parent) : QWidget(parent)
     miMaxBarrageNumber = 30;
     miRefreshTimer = startTimer(15);
     resize(QApplication::desktop()->width(), QApplication::desktop()->height());
+    SetWindowLong((HWND)winId(), GWL_EXSTYLE, GetWindowLong((HWND)winId(), GWL_EXSTYLE) |
+                   WS_EX_TRANSPARENT | WS_EX_LAYERED);
 }
 
 CBarrageScreen::~CBarrageScreen()
