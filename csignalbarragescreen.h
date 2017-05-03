@@ -19,8 +19,10 @@ public:
 public slots:
     void setItem(CBarrageItem *item);
     void changeFixed();
+    void changeForceTop();
     void changeAutoMove();
     void moveNextPoint();
+    void changeMouseThrough();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -45,7 +47,10 @@ private:
     int           miMoveAutoTimer;
     bool          mbAutoMove;
     bool          mbLeftMousePressed;
+    bool          mbForceTop;
     QPoint        moLastPos;
+    long          miWindowLong;
+
 };
 
 #endif // CSIGNALBARRAGESCREEN_H

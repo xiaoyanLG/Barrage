@@ -46,6 +46,11 @@ void SystemTray::InitTyay()
     closeBarrageScreen->setChecked(!CBarrageScreen::getScreen()->isHidden());
     connect(closeBarrageScreen, SIGNAL(triggered()), this, SLOT(hideBarrageScreen()));
 
+    QAction *top = new QAction(QStringLiteral("强制置顶"),this);
+    top->setCheckable(true);
+    top->setChecked(CBarrageScreen::getScreen()->forceTop());
+    connect(top, SIGNAL(triggered()), CBarrageScreen::getScreen(), SLOT(changeForceTop()));
+
     QAction *closeAllAnimations = new QAction(QStringLiteral("关闭所有动画"),this);
     connect(closeAllAnimations, SIGNAL(triggered()), this, SLOT(closeAllAnimation()));
 
@@ -57,6 +62,7 @@ void SystemTray::InitTyay()
             this,
             SLOT(SystemTrayActivated(QSystemTrayIcon::ActivationReason)));
 
+    myMenu->addAction(top);
     myMenu->addAction(closeBarrageScreen);
     myMenu->addAction(closeAllAnimations);
     myMenu->addAction(quitAction);

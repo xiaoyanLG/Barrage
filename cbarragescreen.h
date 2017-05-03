@@ -11,11 +11,14 @@ class CBarrageScreen : public QWidget
 public:
     ~CBarrageScreen();
     static CBarrageScreen *getScreen();
+    bool forceTop();
 
 public slots:
     void addItem(CBarrageItem *item);
     void delItem(CBarrageItem *item);
     void setMaxBarrageNumber(int max);
+    void changeForceTop();
+    void setForceTop(bool top);
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -30,6 +33,7 @@ private:
 
     int                   miMaxBarrageNumber;
     int                   miRefreshTimer;
+    bool                  mbForceTop;
 };
 
 #endif // CBARRAGESCREEN_H

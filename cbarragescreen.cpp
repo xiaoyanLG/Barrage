@@ -15,6 +15,7 @@ CBarrageScreen::CBarrageScreen(QWidget *parent) : QWidget(parent)
                          | Qt::WindowType_Mask);
     this->setAttribute(Qt::WA_TranslucentBackground);
 
+    mbForceTop = false;
     miMaxBarrageNumber = 30;
     miRefreshTimer = startTimer(15);
     resize(QApplication::desktop()->width(), QApplication::desktop()->height());
@@ -32,6 +33,11 @@ CBarrageScreen *CBarrageScreen::getScreen()
         mopInstance = new CBarrageScreen;
     }
     return mopInstance;
+}
+
+bool CBarrageScreen::forceTop()
+{
+    return mbForceTop;
 }
 
 void CBarrageScreen::addItem(CBarrageItem *item)
@@ -56,6 +62,16 @@ void CBarrageScreen::delItem(CBarrageItem *item)
 void CBarrageScreen::setMaxBarrageNumber(int max)
 {
     miMaxBarrageNumber = max;
+}
+
+void CBarrageScreen::changeForceTop()
+{
+    mbForceTop = !mbForceTop;
+}
+
+void CBarrageScreen::setForceTop(bool top)
+{
+    mbForceTop = top;
 }
 
 void CBarrageScreen::paintEvent(QPaintEvent *event)
@@ -159,7 +175,10 @@ void CBarrageScreen::paintEvent(QPaintEvent *event)
             delItem(item);
         }
     }
-
+    if (mbForceTop)
+    {
+        raise();
+    }
     painter.end();
 }
 

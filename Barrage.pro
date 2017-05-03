@@ -29,7 +29,10 @@ SOURCES += main.cpp\
     qtsingle/qtlockedfile_win.cpp \
     qtsingle/qtsingleapplication.cpp \
     qtsingle/qtsinglecoreapplication.cpp \
-    qtsingle/qtlockedfile_unix.cpp
+    qtsingle/qtlockedfile_unix.cpp \
+    xyaction.cpp \
+    xybordershadowwidget.cpp \
+    xymenu.cpp
 
 HEADERS  += mainwindow.h \
     cbarrageitem.h \
@@ -44,7 +47,10 @@ HEADERS  += mainwindow.h \
     qtsingle/qtlocalpeer.h \
     qtsingle/qtlockedfile.h \
     qtsingle/qtsingleapplication.h \
-    qtsingle/qtsinglecoreapplication.h
+    qtsingle/qtsinglecoreapplication.h \
+    xyaction.h \
+    xybordershadowwidget.h \
+    xymenu.h
 
 FORMS += \
     mainwindow.ui
