@@ -17,11 +17,3 @@ XYAction::~XYAction()
 {
 
 }
-
-bool XYAction::event(QEvent *event)
-{
-    qDebug() << "+++++++++++++++6666666666666666666";
-    event->accept();
-    return false;
-}
-

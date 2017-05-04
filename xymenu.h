@@ -3,6 +3,7 @@
 
 #include "xybordershadowwidget.h"
 #include <QEventLoop>
+#include <QVBoxLayout>
 
 class XYMenu : public XYBorderShadowWidget
 {
@@ -16,10 +17,13 @@ public slots:
     bool close();
 
 protected:
+    void childEvent(QChildEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event);
     void focusOutEvent(QFocusEvent *event);
 
 private:
-    QEventLoop *mopEventLoop;
+    QEventLoop  *mopEventLoop;
+    QVBoxLayout *mopMainLayout;
 };
 
 #endif // XYMENU_H

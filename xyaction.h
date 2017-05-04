@@ -11,8 +11,6 @@ public:
     XYAction(const QString &title, QObject *parent = NULL);
     ~XYAction();
 
-protected:
-    bool event(QEvent *event);
 };
 
 #endif // XYACTION_H
