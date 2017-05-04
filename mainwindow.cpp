@@ -16,6 +16,13 @@
 #include "csignalbarragescreen.h"
 
 #include <QDebug>
+
+MainWindow *MainWindow::mopInstance = NULL;
+MainWindow *MainWindow::instance()
+{
+    return mopInstance;
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -30,7 +37,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_add, SIGNAL(clicked()), this, SLOT(addAnimation()));
 
     miTimer = startTimer(1000*60);
+        ui->textEdit->clear();
+        insertImage(":/Gif/60");
     resize(1000, 700);
+    mopInstance = this;
+}
+
+QFont MainWindow::getFont()
+{
+    return ui->fontComboBox->currentFont();
 }
 
 MainWindow::~MainWindow()

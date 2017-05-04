@@ -9,6 +9,7 @@ class XYAction : public QAction
 public:
     XYAction(QObject *parent = NULL);
     XYAction(const QString &title, QObject *parent = NULL);
+    XYAction(const QIcon &icon, const QString &text, QObject *parent = NULL);
     ~XYAction();
 
 };

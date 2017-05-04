@@ -11,7 +11,7 @@ void test()
 {
     qsrand(QTime::currentTime().msecsSinceStartOfDay());
     CBarrageScreen *screen = CBarrageScreen::getScreen();
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 0; ++i)
     {
         CBarrageItem *item = new CBarrageItem(new Contents(QStringLiteral("我就是来打酱油的~")), 8000, "green");
         QColor c(qrand()%256,qrand()%256,qrand()%256);

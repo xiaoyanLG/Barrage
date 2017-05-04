@@ -48,6 +48,7 @@ private:
     bool          mbAutoMove;
     bool          mbLeftMousePressed;
     bool          mbForceTop;
+    bool          mbMouseThrough;
     QPoint        moLastPos;
     long          miWindowLong;
 

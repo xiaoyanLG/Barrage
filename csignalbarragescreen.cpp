@@ -1,4 +1,6 @@
 ﻿#include "csignalbarragescreen.h"
+#include "xymenu.h"
+#include "xyaction.h"
 #include <QPainter>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -19,6 +21,7 @@ CSignalBarrageScreen::CSignalBarrageScreen(CBarrageItem *item, QWidget *parent)
     mbFixed = false;
     mbAutoMove = false;
     mbForceTop = false;
+    mbMouseThrough = false;
     mopMoveAnimation = NULL;
     mopStepAnimation = NULL;
     mopContentsItem = NULL;
@@ -246,10 +249,12 @@ void CSignalBarrageScreen::changeMouseThrough()
     {
         SetWindowLong((HWND)winId(), GWL_EXSTYLE, GetWindowLong((HWND)winId(), GWL_EXSTYLE) |
                        WS_EX_TRANSPARENT | WS_EX_LAYERED);
+        mbMouseThrough = true;
     }
     else
     {
         SetWindowLong((HWND)winId(), GWL_EXSTYLE, miWindowLong);
+        mbMouseThrough = false;
     }
 }
 
@@ -406,7 +411,7 @@ void CSignalBarrageScreen::mouseMoveEvent(QMouseEvent *event)
 
 void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
 {
-    QMenu menu(this);
+    XYMenu menu(this);
     QAction *exit = new QAction("Exit", &menu);
     connect(exit, SIGNAL(triggered()), this, SLOT(close()));
     connect(exit, SIGNAL(triggered()), this, SLOT(deleteLater()));
@@ -433,12 +438,16 @@ void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
 
     QAction *through = new QAction("MouseThrough", &menu);
     through->setCheckable(true);
-    through->setChecked(mbForceTop);
+    through->setChecked(mbMouseThrough);
     connect(through, SIGNAL(triggered()), this, SLOT(changeMouseThrough()));
+
+    XYMenu menu2("12121212121");
+
 
     menu.addAction(through);
     menu.addAction(top);
     menu.addAction(random);
+    menu.addMenu(&menu2);
     menu.addAction(automove);
     menu.addAction(fixed);
     menu.addAction(exit);

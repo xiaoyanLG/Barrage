@@ -300,5 +300,8 @@
         <file>Gif2/101</file>
         <file>Gif2/102</file>
         <file>Gif2/103</file>
+        <file>sourceImage/checked.ico</file>
+        <file>sourceImage/unchecked.ico</file>
+        <file>sourceImage/menu2.ico</file>
     </qresource>
 </RCC>

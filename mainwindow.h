@@ -15,7 +15,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    static MainWindow *instance();
     explicit MainWindow(QWidget *parent = 0);
+    QFont getFont();
+
     ~MainWindow();
     CBarrageItem *getItem(int time = 0);
 
@@ -33,6 +36,7 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
+    static  MainWindow  *mopInstance;
     Ui::MainWindow *ui;
     int                  miTimer;
     int                  miLoopShot;

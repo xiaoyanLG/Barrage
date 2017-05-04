@@ -13,6 +13,12 @@ XYAction::XYAction(const QString &title, QObject *parent)
 
 }
 
+XYAction::XYAction(const QIcon &icon, const QString &text, QObject *parent)
+    :QAction(icon, text, parent)
+{
+
+}
+
 XYAction::~XYAction()
 {
 
