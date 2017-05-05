@@ -122,15 +122,17 @@ void CBarrageScreen::paintEvent(QPaintEvent *event)
             switch (contents->type)
             {
             case Contents::TEXT:
+            {
                 painter.drawText(QRect(currentPos.x() + offset_X,
                                        currentPos.y() + offset_Y,
                                        limit_X < 0 ? 0:limit_X,
                                        limit_Y < 0 ? 0:limit_Y),
                                  contents->text);
-                offset_X += contents->text.toLatin1().length()
-                        * item->moTextFont.pointSize() + 2;
-                current_Y = qMax(current_Y, item->moTextFont.pointSize() + 2.0);
+                QFontMetrics metrics(item->moTextFont);
+                offset_X += metrics.width(contents->text) + 2;
+                current_Y = qMax(current_Y, metrics.height() + 2.0);
                 break;
+            }
             case Contents::LF:
                 offset_Y += current_Y;
                 offset_X = 0;

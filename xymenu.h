@@ -7,6 +7,7 @@
 #include <QIcon>
 #include <QMap>
 
+class XYMenuStyle;
 class XYMenu : public XYBorderShadowWidget
 {
     Q_OBJECT
@@ -21,7 +22,8 @@ public:
 
 public slots:
     int exec();
-    bool close();
+    int exec(XYMenu *parent);
+    bool close(bool closeParent = false);
     void setTitle(const QString &title);
     void setIcon(const QIcon &icon);
     void setFont(const QFont &font);
@@ -33,16 +35,22 @@ protected:
     void focusOutEvent(QFocusEvent *event);
 
 private:
+    void execMenu2(XYMenuStyle *style);
     void setupUI();
 
 private:
     QMap<int, XYMenu *> mlistMenus;
+    XYMenu        *mopParentMenu;
     QEventLoop    *mopEventLoop;
     QVBoxLayout   *mopMainLayout;
+    XYMenuStyle   *mopCurrentChecked;
 
     QString        msTitle;
     QIcon          moIcon;
     QFont          moFont;
+    int            miActionMaxWidth;
+
+    friend class   XYMenuStyle;
 };
 
 #endif // XYMENU_H

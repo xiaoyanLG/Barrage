@@ -1,17 +1,18 @@
 ﻿#include "xymenustyle.h"
 #include <QPainter>
+#include <QMouseEvent>
 #include <QDebug>
+#include <QAction>
+#include <Windows.h>
 
-int XYMenuStyle::mimaxWidth = 0;
-XYMenuStyle::XYMenuStyle(XYAction *action, QWidget *parent)
+static int iglobal = 0;
+XYMenuStyle::XYMenuStyle(QAction *action, QWidget *parent)
     :QWidget(parent)
 {
     mopAction = action;
     mopMenu = NULL;
     mbContainsMouse = false;
     mbIsMenu = false;
-
-    setMaxWidth();
 }
 
 XYMenuStyle::XYMenuStyle(XYMenu *menu, QWidget *parent)
@@ -21,8 +22,6 @@ XYMenuStyle::XYMenuStyle(XYMenu *menu, QWidget *parent)
     mopMenu = menu;
     mbContainsMouse = false;
     mbIsMenu = true;
-
-    setMaxWidth();
 }
 
 XYMenuStyle::~XYMenuStyle()
@@ -32,7 +31,6 @@ XYMenuStyle::~XYMenuStyle()
 
 void XYMenuStyle::paintEvent(QPaintEvent *event)
 {
-    setFixedSize(30 + 25 + mimaxWidth + 25, 30);
     int width = this->width();
     int height = this->height();
     QPainter painter(this);
@@ -41,7 +39,8 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
     QFont font = painter.font();
 
     // 画底色
-    if (mbContainsMouse)
+    XYMenu *parent = (XYMenu *)this->parentWidget();
+    if (parent->mopCurrentChecked == this)
     {
         painter.setBrush(QColor("#2871d5"));
     }
@@ -65,6 +64,7 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
         // 画字体
         painter.setFont(mopAction->font());
         painter.setPen(pen);
+        painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
         painter.drawText(QRect(25 + 20,
                                (height - font.pointSize()) / 2,
                                width,
@@ -87,7 +87,7 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
             checkico = checkico.scaled(QSize(15, 15),
                                        Qt::KeepAspectRatio,
                                        Qt::SmoothTransformation);
-            painter.drawPixmap(QRect(25 + 20 + mimaxWidth + 10,
+            painter.drawPixmap(QRect(25 + 20 + ((XYMenu *)parentWidget())->miActionMaxWidth + 10,
                                      (height - checkico.height()) / 2,
                                      checkico.width(),
                                      checkico.height()),
@@ -121,7 +121,7 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
         menuico = menuico.scaled(QSize(15, 15),
                                    Qt::KeepAspectRatio,
                                    Qt::SmoothTransformation);
-        painter.drawPixmap(QRect(25 + 20 + mimaxWidth + 15,
+        painter.drawPixmap(QRect(25 + 20 + ((XYMenu *)parentWidget())->miActionMaxWidth + 15,
                                  (height - menuico.height()) / 2,
                                  menuico.width(),
                                  menuico.height()),
@@ -132,48 +132,48 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
 
 void XYMenuStyle::enterEvent(QEvent *event)
 {
-    mbContainsMouse = true;
+    WId id = (WId)GetFocus();
+    QWidget *cwd = find(id);
+    qDebug() << __FUNCTION__ << cwd;
+//    SetFocus();
+    XYMenu *parent = (XYMenu *)this->parentWidget();
+    parent->mopCurrentChecked = this;
+//    parent->raise();
+    SetFocus((HWND)parent->winId());
     update();
+    parent->execMenu2(this);
 }
 
 void XYMenuStyle::leaveEvent(QEvent *event)
 {
-    mbContainsMouse = false;
     update();
 }
 
 void XYMenuStyle::mouseReleaseEvent(QMouseEvent *event)
 {
+    // 如果释放鼠标的位置不在窗口内，直接退出
+    if (!this->rect().contains(event->pos()))
+    {
+        return;
+    }
     if (!mbIsMenu)
     {
         if (!mopAction->isCheckable())
         {
-            ((QWidget *)parent())->close();
+            ((XYMenu *)parentWidget())->close(true);
         }
         else
         {
             mopAction->setChecked(!mopAction->isChecked());
-            update();
+            if (event->pos().x() < width() - 25)
+            {
+                ((XYMenu *)parentWidget())->close(true);
+            }
+            else
+            {
+                update();
+            }
         }
         emit mopAction->triggered(mopAction->isChecked());
     }
 }
-
-void XYMenuStyle::setMaxWidth()
-{
-    if (mbIsMenu)
-    {
-        QFontMetrics metrics(mopMenu->font());
-        int width = metrics.width(mopMenu->title());
-        mimaxWidth = mimaxWidth > width ? mimaxWidth : width;
-        setFixedSize(30 + 25 + mimaxWidth + 25, 30);
-    }
-    else
-    {
-        QFontMetrics metrics(mopAction->font());
-        int width = metrics.width(mopAction->text());
-        mimaxWidth = mimaxWidth > width ? mimaxWidth : width;
-        setFixedSize(30 + 25 + mimaxWidth + 25, 30);
-    }
-}
-

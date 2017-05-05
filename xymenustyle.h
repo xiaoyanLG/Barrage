@@ -2,14 +2,13 @@
 #define XYMENUSTYLE_H
 
 #include <QWidget>
-#include "xyaction.h"
 #include "xymenu.h"
 
 class XYMenuStyle : public QWidget
 {
     Q_OBJECT
 public:
-    XYMenuStyle(XYAction *action, QWidget *parent = 0);
+    XYMenuStyle(QAction *action, QWidget *parent = 0);
     XYMenuStyle(XYMenu *menu, QWidget *parent = 0);
     ~XYMenuStyle();
 
@@ -20,15 +19,13 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
 private:
-    void setMaxWidth();
-
-private:
-    static int mimaxWidth;
-    XYAction  *mopAction;
+    QAction   *mopAction;
     XYMenu    *mopMenu;
     bool       mbContainsMouse;
 
     bool       mbIsMenu;
+
+    friend class XYMenu;
 
 };
 

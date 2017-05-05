@@ -88,9 +88,11 @@ void CSignalBarrageScreen::setItem(CBarrageItem *item)
                 switch (contents->type)
                 {
                 case Contents::TEXT:
-                    w += mopContentsItem->moTextFont.pointSize()
-                             * contents->text.toLocal8Bit().length();
+                {
+                    QFontMetrics metrics(mopContentsItem->moTextFont);
+                    w += metrics.width(contents->text) + 2;
                     break;
+                }
                 case Contents::LF:
                     width = qMax(w, width);
                     w = 0;
@@ -128,8 +130,11 @@ void CSignalBarrageScreen::setItem(CBarrageItem *item)
                 switch (contents->type)
                 {
                 case Contents::TEXT:
-                    h = qMax(h, mopContentsItem->moTextFont.pointSize() + 5);
+                {
+                    QFontMetrics metrics(mopContentsItem->moTextFont);
+                    h = qMax(h, metrics.height() + 2);
                     break;
+                }
                 case Contents::LF:
                     height += h;
                     h = 0;
@@ -298,15 +303,17 @@ void CSignalBarrageScreen::paintEvent(QPaintEvent *event)
         switch (contents->type)
         {
         case Contents::TEXT:
+        {
             painter.drawText(QRect(offset_X,
                                    offset_Y,
                                    limit_X < 0 ? 0:limit_X,
                                    limit_Y < 0 ? 0:limit_Y),
                              contents->text);
-            offset_X += contents->text.toLatin1().length()
-                    * item->moTextFont.pointSize();
-            current_Y = qMax(current_Y, item->moTextFont.pointSize() + 1.0);
+            QFontMetrics metrics(item->moTextFont);
+            offset_X += metrics.width(contents->text) + 2.0;
+            current_Y = qMax(current_Y, metrics.height() + 2.0);
             break;
+        }
         case Contents::LF:
             offset_Y += current_Y;
             offset_X = 0;
@@ -414,7 +421,6 @@ void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
     XYMenu menu(this);
     QAction *exit = new QAction("Exit", &menu);
     connect(exit, SIGNAL(triggered()), this, SLOT(close()));
-    connect(exit, SIGNAL(triggered()), this, SLOT(deleteLater()));
 
     QAction *fixed = new QAction("Fixed", &menu);
     fixed->setCheckable(true);
@@ -442,16 +448,33 @@ void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
     connect(through, SIGNAL(triggered()), this, SLOT(changeMouseThrough()));
 
     XYMenu menu2("12121212121");
+    QAction *aa = new QAction("aaaaaaaaaaa", &menu2);
+    QAction *bb = new QAction("bbbbbbbbbbbbb", &menu2);
+    bb->setCheckable(true);
+    QAction *cc = new QAction("ccccccc", &menu2);
+    QAction *dd = new QAction("bbbbbbbbbbbbb", &menu2);
+    QAction *ee = new QAction("ccccccc", &menu2);
 
+    XYMenu menu3("3333333333");
+    QAction *ff = new QAction("54654968496", &menu3);
+    menu3.addAction(ff);
+    menu2.addAction(aa);
+    menu2.addAction(bb);
+    menu2.addAction(cc);
+    menu2.addAction(dd);
+    menu2.addMenu(&menu3);
+    menu2.addAction(ee);
 
     menu.addAction(through);
     menu.addAction(top);
     menu.addAction(random);
-    menu.addMenu(&menu2);
+
     menu.addAction(automove);
     menu.addAction(fixed);
+    menu.addMenu(&menu2);
     menu.addAction(exit);
     menu.move(pos().x() + event->x(), pos().y() + event->y());
+    qDebug() <<&menu;
     menu.exec();
 }
 
