@@ -222,6 +222,7 @@ void CSignalBarrageScreen::moveNextPoint()
             index = qrand() % mmapPath.size();
         }
         QPoint curpos = pos();
+        qDebug() << __FUNCTION__ << index;
         switch (index)
         {
         case 0:
@@ -280,6 +281,12 @@ void CSignalBarrageScreen::choiseMovePath()
 
     bool choise = mmapPath.value(data);
     mmapPath[data] = !choise;
+
+    if (!(mmapPath[0] || mmapPath[1] || mmapPath[2] || mmapPath[3] || mmapPath[4]))
+    {
+        mmapPath[data] = choise;
+        act->setChecked(choise);
+    }
 }
 
 void CSignalBarrageScreen::paintEvent(QPaintEvent *event)
@@ -467,6 +474,10 @@ void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
     connect(through, SIGNAL(triggered()), this, SLOT(changeMouseThrough()));
 
     XYMenu movepath("Move Path");
+    QAction *line = new QAction("Line", &movepath);
+    line->setData(0);
+    line->setCheckable(true);
+    line->setChecked(mmapPath.value(0));
     QAction *curve = new QAction("Curve", &movepath);
     curve->setData(1);
     curve->setCheckable(true);
@@ -484,11 +495,13 @@ void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
     arc->setCheckable(true);
     arc->setChecked(mmapPath.value(4));
 
+    connect(line, SIGNAL(triggered()), this, SLOT(choiseMovePath()));
     connect(curve, SIGNAL(triggered()), this, SLOT(choiseMovePath()));
     connect(trigon, SIGNAL(triggered()), this, SLOT(choiseMovePath()));
     connect(rect, SIGNAL(triggered()), this, SLOT(choiseMovePath()));
     connect(arc, SIGNAL(triggered()), this, SLOT(choiseMovePath()));
 
+    movepath.addAction(line);
     movepath.addAction(curve);
     movepath.addAction(trigon);
     movepath.addAction(rect);

@@ -98,7 +98,7 @@ int XYMenu::exec(XYMenu *parent)
     setupUI();
     QPoint pos = QCursor::pos();
     pos.setX(parent->pos().x() + parent->width() - 25);
-    pos.setY(pos.y() - 10);
+    pos.setY(pos.y() - 15);
     show();
     // show 出来以后才能获取正确的窗口大小
     int width = this->width();
@@ -110,7 +110,7 @@ int XYMenu::exec(XYMenu *parent)
     }
     if (top->height() < height + pos.y())
     {
-        pos.setY(pos.y() - height + 30);
+        pos.setY(pos.y() - height - 15);
     }
     move(pos);
     return mopEventLoop->exec();
