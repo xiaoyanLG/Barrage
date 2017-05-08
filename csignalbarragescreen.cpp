@@ -26,13 +26,14 @@ CSignalBarrageScreen::CSignalBarrageScreen(CBarrageItem *item, QWidget *parent)
     mopContentsItem = NULL;
     miMoveAutoTimer = 0;
     setItem(item);
-    miRefreshTimer = startTimer(30);
     miWindowLong = GetWindowLong((HWND)winId(), GWL_EXSTYLE);
 
     for (int i = 0; i < 5; ++i)
     {
         mmapPath.insert(i, true);
     }
+
+    miRefreshTimer = startTimer(30);
 }
 
 CSignalBarrageScreen::~CSignalBarrageScreen()
@@ -216,10 +217,9 @@ void CSignalBarrageScreen::moveNextPoint()
     // 随机产生轨迹
     {
         int index = qrand() % mmapPath.size();
-        if (!mmapPath.value(index))
+        while (!mmapPath.value(index))
         {
-            moveNextPoint();
-            return;
+            index = qrand() % mmapPath.size();
         }
         QPoint curpos = pos();
         switch (index)
