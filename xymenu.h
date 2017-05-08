@@ -2,12 +2,13 @@
 #define XYMENU_H
 
 #include "xybordershadowwidget.h"
-#include <QEventLoop>
-#include <QVBoxLayout>
 #include <QIcon>
 #include <QMap>
 
 class XYMenuStyle;
+class QEventLoop;
+class QVBoxLayout;
+
 class XYMenu : public XYBorderShadowWidget
 {
     Q_OBJECT
@@ -22,6 +23,7 @@ public:
 
 public slots:
     int exec();
+    void raise();
     int exec(XYMenu *parent);
     bool close(bool closeParent = false);
     void setTitle(const QString &title);
@@ -30,9 +32,8 @@ public slots:
     void addMenu(XYMenu *menu);
 
 protected:
-    void childEvent(QChildEvent *event);
-    bool eventFilter(QObject *watched, QEvent *event);
     void focusOutEvent(QFocusEvent *event);
+    void leaveEvent(QEvent *event);
 
 private:
     void execMenu2(XYMenuStyle *style);
@@ -40,6 +41,7 @@ private:
 
 private:
     QMap<int, XYMenu *> mlistMenus;
+    QList<QWidget *>    mlistWidgets;
     XYMenu        *mopParentMenu;
     QEventLoop    *mopEventLoop;
     QVBoxLayout   *mopMainLayout;

@@ -1,6 +1,5 @@
 ﻿#include "csignalbarragescreen.h"
 #include "xymenu.h"
-#include "xyaction.h"
 #include <QPainter>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -29,6 +28,11 @@ CSignalBarrageScreen::CSignalBarrageScreen(CBarrageItem *item, QWidget *parent)
     setItem(item);
     miRefreshTimer = startTimer(30);
     miWindowLong = GetWindowLong((HWND)winId(), GWL_EXSTYLE);
+
+    for (int i = 0; i < 5; ++i)
+    {
+        mmapPath.insert(i, true);
+    }
 }
 
 CSignalBarrageScreen::~CSignalBarrageScreen()
@@ -211,7 +215,12 @@ void CSignalBarrageScreen::moveNextPoint()
 
     // 随机产生轨迹
     {
-        int index = qrand() % 5;
+        int index = qrand() % mmapPath.size();
+        if (!mmapPath.value(index))
+        {
+            moveNextPoint();
+            return;
+        }
         QPoint curpos = pos();
         switch (index)
         {
@@ -261,6 +270,16 @@ void CSignalBarrageScreen::changeMouseThrough()
         SetWindowLong((HWND)winId(), GWL_EXSTYLE, miWindowLong);
         mbMouseThrough = false;
     }
+}
+
+void CSignalBarrageScreen::choiseMovePath()
+{
+    QAction *act = (QAction *)sender();
+
+    int data = act->data().toInt();
+
+    bool choise = mmapPath.value(data);
+    mmapPath[data] = !choise;
 }
 
 void CSignalBarrageScreen::paintEvent(QPaintEvent *event)
@@ -447,34 +466,42 @@ void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
     through->setChecked(mbMouseThrough);
     connect(through, SIGNAL(triggered()), this, SLOT(changeMouseThrough()));
 
-    XYMenu menu2("12121212121");
-    QAction *aa = new QAction("aaaaaaaaaaa", &menu2);
-    QAction *bb = new QAction("bbbbbbbbbbbbb", &menu2);
-    bb->setCheckable(true);
-    QAction *cc = new QAction("ccccccc", &menu2);
-    QAction *dd = new QAction("bbbbbbbbbbbbb", &menu2);
-    QAction *ee = new QAction("ccccccc", &menu2);
+    XYMenu movepath("Move Path");
+    QAction *curve = new QAction("Curve", &movepath);
+    curve->setData(1);
+    curve->setCheckable(true);
+    curve->setChecked(mmapPath.value(1));
+    QAction *trigon = new QAction("Trigon", &movepath);
+    trigon->setData(2);
+    trigon->setCheckable(true);
+    trigon->setChecked(mmapPath.value(2));
+    QAction *rect = new QAction("Rect", &movepath);
+    rect->setData(3);
+    rect->setCheckable(true);
+    rect->setChecked(mmapPath.value(3));
+    QAction *arc = new QAction("Arc", &movepath);
+    arc->setData(4);
+    arc->setCheckable(true);
+    arc->setChecked(mmapPath.value(4));
 
-    XYMenu menu3("3333333333");
-    QAction *ff = new QAction("54654968496", &menu3);
-    menu3.addAction(ff);
-    menu2.addAction(aa);
-    menu2.addAction(bb);
-    menu2.addAction(cc);
-    menu2.addAction(dd);
-    menu2.addMenu(&menu3);
-    menu2.addAction(ee);
+    connect(curve, SIGNAL(triggered()), this, SLOT(choiseMovePath()));
+    connect(trigon, SIGNAL(triggered()), this, SLOT(choiseMovePath()));
+    connect(rect, SIGNAL(triggered()), this, SLOT(choiseMovePath()));
+    connect(arc, SIGNAL(triggered()), this, SLOT(choiseMovePath()));
 
+    movepath.addAction(curve);
+    movepath.addAction(trigon);
+    movepath.addAction(rect);
+    movepath.addAction(arc);
+
+    menu.addMenu(&movepath);
     menu.addAction(through);
     menu.addAction(top);
     menu.addAction(random);
 
     menu.addAction(automove);
     menu.addAction(fixed);
-    menu.addMenu(&menu2);
     menu.addAction(exit);
-    menu.move(pos().x() + event->x(), pos().y() + event->y());
-    qDebug() <<&menu;
     menu.exec();
 }
 

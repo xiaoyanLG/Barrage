@@ -1,11 +1,8 @@
 ﻿#include "xymenustyle.h"
 #include <QPainter>
 #include <QMouseEvent>
-#include <QDebug>
 #include <QAction>
-#include <Windows.h>
 
-static int iglobal = 0;
 XYMenuStyle::XYMenuStyle(QAction *action, QWidget *parent)
     :QWidget(parent)
 {
@@ -132,14 +129,8 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
 
 void XYMenuStyle::enterEvent(QEvent *event)
 {
-    WId id = (WId)GetFocus();
-    QWidget *cwd = find(id);
-    qDebug() << __FUNCTION__ << cwd;
-//    SetFocus();
     XYMenu *parent = (XYMenu *)this->parentWidget();
     parent->mopCurrentChecked = this;
-//    parent->raise();
-    SetFocus((HWND)parent->winId());
     update();
     parent->execMenu2(this);
 }
@@ -172,8 +163,14 @@ void XYMenuStyle::mouseReleaseEvent(QMouseEvent *event)
             else
             {
                 update();
+                ((XYMenu *)parentWidget())->raise();
             }
         }
         emit mopAction->triggered(mopAction->isChecked());
     }
+    else
+    {
+        mopMenu->raise();
+    }
+    event->accept();
 }

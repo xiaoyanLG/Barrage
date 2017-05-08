@@ -14,7 +14,8 @@ public:
 private slots:
     void hideBarrageScreen();
     void closeAllAnimation();
-    void ShowParent();
+    void showParent();
+    void showContext();
     void SystemTrayActivated(QSystemTrayIcon::ActivationReason reason);//处理点击托盘操作
 
 signals:

@@ -6,6 +6,7 @@
 #include <QMenu>
 #include "csignalbarragescreen.h"
 #include "mainwindow.h"
+#include "xymenu.h"
 
 void test()
 {
@@ -40,33 +41,10 @@ SystemTray::~SystemTray()
 }
 void SystemTray::InitTyay()
 {
-    QMenu *myMenu = new QMenu();
-    QAction *closeBarrageScreen = new QAction(QStringLiteral("关闭弹幕窗口"),this);
-    closeBarrageScreen->setCheckable(true);
-    closeBarrageScreen->setChecked(!CBarrageScreen::getScreen()->isHidden());
-    connect(closeBarrageScreen, SIGNAL(triggered()), this, SLOT(hideBarrageScreen()));
-
-    QAction *top = new QAction(QStringLiteral("强制置顶"),this);
-    top->setCheckable(true);
-    top->setChecked(CBarrageScreen::getScreen()->forceTop());
-    connect(top, SIGNAL(triggered()), CBarrageScreen::getScreen(), SLOT(changeForceTop()));
-
-    QAction *closeAllAnimations = new QAction(QStringLiteral("关闭所有动画"),this);
-    connect(closeAllAnimations, SIGNAL(triggered()), this, SLOT(closeAllAnimation()));
-
-    QAction *quitAction = new QAction(QStringLiteral("不要我了。。。(退出)"),this);
-
-    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(this,
             SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this,
             SLOT(SystemTrayActivated(QSystemTrayIcon::ActivationReason)));
-
-    myMenu->addAction(top);
-    myMenu->addAction(closeBarrageScreen);
-    myMenu->addAction(closeAllAnimations);
-    myMenu->addAction(quitAction);
-    this->setContextMenu(myMenu);
 
     this->setIcon(QIcon(":/send.ico"));
     this->setToolTip(QStringLiteral("给你惊喜！！！"));
@@ -82,7 +60,7 @@ void SystemTray::closeAllAnimation()
     CSignalBarrageScreen::closeAllWidget();
 }
 
-void SystemTray::ShowParent()
+void SystemTray::showParent()
 {
     QWidget *parent = (QWidget *)this->parent();
     if (parent)
@@ -92,18 +70,58 @@ void SystemTray::ShowParent()
     }
 }
 
+void SystemTray::showContext()
+{
+    static XYMenu *myMenu = NULL;
+    if (myMenu == NULL)
+    {
+        XYMenu *myMenu = new XYMenu;
+        QAction *closeBarrageScreen = new QAction(QStringLiteral("关闭弹幕窗口"), myMenu);
+        closeBarrageScreen->setCheckable(true);
+        closeBarrageScreen->setChecked(CBarrageScreen::getScreen()->isHidden());
+        connect(closeBarrageScreen, SIGNAL(triggered()), this, SLOT(hideBarrageScreen()));
+
+        QAction *top = new QAction(QStringLiteral("强制置顶"), myMenu);
+        top->setCheckable(true);
+        top->setChecked(CBarrageScreen::getScreen()->forceTop());
+        connect(top, SIGNAL(triggered()), CBarrageScreen::getScreen(), SLOT(changeForceTop()));
+
+        QAction *closeAllAnimations = new QAction(QStringLiteral("关闭所有动画"), myMenu);
+        connect(closeAllAnimations, SIGNAL(triggered()), this, SLOT(closeAllAnimation()));
+
+        QAction *quitAction = new QAction(QStringLiteral("不要我了。。。(退出)"), myMenu);
+
+        connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+        myMenu->addAction(top);
+        myMenu->addAction(closeBarrageScreen);
+        myMenu->addAction(closeAllAnimations);
+        myMenu->addAction(quitAction);
+        myMenu->exec();
+    }
+    else if (myMenu->isHidden())
+    {
+        myMenu->exec();
+    }
+}
+
 void SystemTray::SystemTrayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch(reason)
     {
-    case QSystemTrayIcon::Trigger:
+    case QSystemTrayIcon::Context:
     {
-        ShowParent();
+        showContext();
         break;
     }
     case QSystemTrayIcon::DoubleClick:
     {
-        ShowParent();
+        showParent();
+        break;
+    }
+    case QSystemTrayIcon::Trigger:
+    {
+        showParent();
         break;
     }
     default:

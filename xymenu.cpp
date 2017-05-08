@@ -1,13 +1,12 @@
 ﻿#include "xymenu.h"
 #include "xymenustyle.h"
-#include "xyaction.h"
-#include <QDebug>
+#include <QAction>
 #include <QEventLoop>
 #include <QApplication>
 #include <QDesktopWidget>
-#include <QtWidgets>
+#include <QVBoxLayout>
+#include <Windows.h>
 
-static int iglobal = 0;
 XYMenu::XYMenu(QWidget *parent)
     : XYBorderShadowWidget(parent)
 {
@@ -19,7 +18,12 @@ XYMenu::XYMenu(QWidget *parent)
     miActionMaxWidth = 0;
     mopParentMenu = NULL;
     mopMainLayout->setSpacing(0);
-//    setFocus();
+
+    raise();
+    if (!mlistWidgets.contains(this))
+    {
+        mlistWidgets.append(this);
+    }
 }
 
 XYMenu::XYMenu(const QString &title, QWidget *parent)
@@ -52,12 +56,11 @@ QFont XYMenu::font()
 
 XYMenu::~XYMenu()
 {
-//    qDebug() << __FUNCTION__ << iglobal++;
+
 }
 
 int XYMenu::exec()
 {
-//    qDebug() << __FUNCTION__;
     setupUI();
     QPoint pos = QCursor::pos();
     show();
@@ -77,9 +80,16 @@ int XYMenu::exec()
     return mopEventLoop->exec();
 }
 
+void XYMenu::raise()
+{
+    QWidget::raise();
+    QWidget::setFocus();
+    // 这里直接使用QT的setfocus函数无效，改用系统API（windows）
+    SetFocus((HWND)this->winId());
+}
+
 int XYMenu::exec(XYMenu *parent)
 {
-//    qDebug() << __FUNCTION__ << this<< iglobal++;
     // 判断是否传入空指针
     if (parent == NULL)
     {
@@ -108,7 +118,6 @@ int XYMenu::exec(XYMenu *parent)
 
 bool XYMenu::close(bool closeParent)
 {
-//    qDebug() << __FUNCTION__ << closeParent << this << iglobal++;
     if (mopEventLoop != NULL)
     {
         mopEventLoop->exit();
@@ -128,15 +137,13 @@ bool XYMenu::close(bool closeParent)
     // 先把焦点给父菜单
     if (mopParentMenu)
     {
-        qDebug() << "++++++++++++++" << iglobal++ << mopParentMenu;
         mopParentMenu->raise();
-        mopParentMenu->setFocus();
     }
 
     // 最后判断是否需要关闭父菜单
     if (mopParentMenu && closeParent)
     {
-        mopParentMenu->close(closeParent);
+        return mopParentMenu->close(closeParent);
     }
     else
     {
@@ -161,73 +168,62 @@ void XYMenu::setFont(const QFont &font)
 
 void XYMenu::addMenu(XYMenu *menu)
 {
-    menu->mopParentMenu = this;
-    mlistMenus.insert(actions().size(), menu);
-}
-
-void XYMenu::childEvent(QChildEvent *event)
-{
-//    qDebug() << __FUNCTION__;
-    if (event->added())
+    if (menu != NULL)
     {
-        QObject *child = event->child();
-        if (child->isWidgetType())
-        {
-            child->installEventFilter(this);
-        }
+        menu->mopParentMenu = this;
+        mlistWidgets += menu->mlistWidgets;
+        mlistMenus.insert(actions().size(), menu);
     }
-}
-
-bool XYMenu::eventFilter(QObject *watched, QEvent *event)
-{
-//    qDebug() << __FUNCTION__ << (void *)GetFocus();
-    if (event->type() == QEvent::FocusOut)
-    {
-        focusOutEvent((QFocusEvent *)event);
-        return true;
-    }
-    return QWidget::eventFilter(watched, event);
 }
 
 void XYMenu::focusOutEvent(QFocusEvent *event)
 {
-//    qDebug() << __FUNCTION__ << this << iglobal++;
-    if (event->type() == QFocusEvent::FocusOut)
+    QWidget *active = qApp->activeWindow();
+    if (!mlistWidgets.contains(active)
+            && !rect().contains(QCursor::pos() - pos()))
     {
-
-        WId child = (WId)GetFocus();
-        QWidget *cwd = find(child);
-        if (mlistMenus.key((XYMenu *)cwd) == NULL)
-        {
-            if (mopParentMenu)
-            {
-                XYMenu *menu = mopParentMenu;
-                bool b_close = true;
-                do
-                {
-                    if (menu->rect().contains(QCursor::pos() - menu->pos()))
-                    {
-                        b_close = false;
-                        break;
-                    }
-                    menu = menu->mopParentMenu;
-                }while (menu);
-                if (b_close)
-                {
-                    close(true);
-                }
-            }
-            else
-            {
-                close();
-            }
-        }
+        close();
     }
+}
+
+void XYMenu::leaveEvent(QEvent *event)
+{
+    bool b_close = true;
+    if (mopParentMenu)
+    {
+        XYMenu *menu = mopParentMenu;
+        do
+        {
+            if (menu->rect().contains(QCursor::pos() - menu->pos()))
+            {
+                b_close = false;
+                break;
+            }
+            menu = menu->mopParentMenu;
+        }while (menu);
+    }
+
+    auto it = mlistMenus.begin();
+    while (it != mlistMenus.end())
+    {
+        XYMenu *menu = it.value();
+        if (menu->rect().contains(QCursor::pos() - menu->pos()))
+        {
+            b_close = false;
+            break;
+        }
+        it++;
+    }
+
+    if (b_close)
+    {
+        close(true);
+    }
+    event->accept();
 }
 
 void XYMenu::execMenu2(XYMenuStyle *style)
 {
-//    qDebug() << __FUNCTION__ << this << iglobal++;
     if (style->mbIsMenu && style->mopMenu)
     {
         if (style->mopMenu->isHidden())
@@ -237,7 +233,6 @@ void XYMenu::execMenu2(XYMenuStyle *style)
         else
         {
             style->mopMenu->raise();
-            style->mopMenu->setFocus();
         }
     }
     else
@@ -271,6 +266,11 @@ void XYMenu::setupUI()
         QFontMetrics metrics(action->font());
         miActionMaxWidth = qMax(miActionMaxWidth, metrics.width(action->text()));
         mopMainLayout->addWidget(style);
+
+        if (!mlistWidgets.contains(style))
+        {
+            mlistWidgets.append(style);
+        }
     }
     auto it = mlistMenus.begin();
     int index = 0;
@@ -281,6 +281,12 @@ void XYMenu::setupUI()
         QFontMetrics metrics(menu->font());
         miActionMaxWidth = qMax(miActionMaxWidth, metrics.width(menu->title()));
         mopMainLayout->insertWidget(index + it.key(), style);
+
+        if (!mlistWidgets.contains(style))
+        {
+            mlistWidgets.append(style);
+        }
+
         it++;
         index++;
     }

@@ -1,10 +1,7 @@
 ﻿#include "xybordershadowwidget.h"
 #include <QPainter>
 #include <QtMath>
-#include <dwmapi.h>
-#include <windowsx.h>
-#include <QDebug>
-#include <QtWidgets>
+
 XYBorderShadowWidget::XYBorderShadowWidget(QWidget *parent)
     : QWidget(parent)
 {

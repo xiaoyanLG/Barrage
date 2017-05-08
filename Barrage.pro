@@ -30,7 +30,6 @@ SOURCES += main.cpp\
     qtsingle/qtsingleapplication.cpp \
     qtsingle/qtsinglecoreapplication.cpp \
     qtsingle/qtlockedfile_unix.cpp \
-    xyaction.cpp \
     xybordershadowwidget.cpp \
     xymenu.cpp \
     xymenustyle.cpp
@@ -49,7 +48,6 @@ HEADERS  += mainwindow.h \
     qtsingle/qtlockedfile.h \
     qtsingle/qtsingleapplication.h \
     qtsingle/qtsinglecoreapplication.h \
-    xyaction.h \
     xybordershadowwidget.h \
     xymenu.h \
     xymenustyle.h

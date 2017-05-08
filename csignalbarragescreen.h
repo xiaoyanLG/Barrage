@@ -23,6 +23,7 @@ public slots:
     void changeAutoMove();
     void moveNextPoint();
     void changeMouseThrough();
+    void choiseMovePath();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -52,6 +53,7 @@ private:
     QPoint        moLastPos;
     long          miWindowLong;
 
+    QMap<int, bool>  mmapPath;
 };
 
 #endif // CSIGNALBARRAGESCREEN_H
