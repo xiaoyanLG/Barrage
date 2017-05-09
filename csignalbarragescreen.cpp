@@ -446,7 +446,7 @@ void CSignalBarrageScreen::mouseMoveEvent(QMouseEvent *event)
 
 void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
 {
-    XYMenu menu(this);
+    XYMenu menu;
     QAction *exit = new QAction("Exit", &menu);
     connect(exit, SIGNAL(triggered()), this, SLOT(close()));
 
