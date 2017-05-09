@@ -51,8 +51,8 @@ void XYToolTips::showToolTips(const QString &tooltips, const QPoint &pos)
     }
     toolwd->msToolTips = tooltips;
     QFontMetrics metrics(qApp->font());
-    int w = metrics.width(tooltips) + 5;
-    int h = metrics.height() + 2;
+    int w = metrics.width(tooltips) + 25;
+    int h = metrics.height() + 25;
     toolwd->show();
 
     QDesktopWidget *top = QApplication::desktop();
