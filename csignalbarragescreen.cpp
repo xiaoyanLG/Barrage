@@ -1,5 +1,6 @@
 ﻿#include "csignalbarragescreen.h"
 #include "xymenu.h"
+#include "xytooltips.h"
 #include <QPainter>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -286,6 +287,7 @@ void CSignalBarrageScreen::choiseMovePath()
     {
         mmapPath[data] = choise;
         act->setChecked(choise);
+        XYToolTips::showToolTips(QStringLiteral("至少选择一种运动轨迹！"));
     }
 }
 

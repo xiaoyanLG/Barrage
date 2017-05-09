@@ -7,6 +7,7 @@
 #include "csignalbarragescreen.h"
 #include "mainwindow.h"
 #include "xymenu.h"
+#include "xytooltips.h"
 
 void test()
 {
@@ -75,7 +76,7 @@ void SystemTray::showContext()
     static XYMenu *myMenu = NULL;
     if (myMenu == NULL)
     {
-        XYMenu *myMenu = new XYMenu;
+        myMenu = new XYMenu;
         QAction *closeBarrageScreen = new QAction(QStringLiteral("关闭弹幕窗口"), myMenu);
         closeBarrageScreen->setCheckable(true);
         closeBarrageScreen->setChecked(CBarrageScreen::getScreen()->isHidden());

@@ -14,6 +14,7 @@
 #include <QTextDocumentWriter>
 #include "cemoticonwidget.h"
 #include "csignalbarragescreen.h"
+#include "xytooltips.h"
 
 #include <QDebug>
 

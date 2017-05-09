@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     qtsingle/qtlockedfile_unix.cpp \
     xybordershadowwidget.cpp \
     xymenu.cpp \
-    xymenustyle.cpp
+    xymenustyle.cpp \
+    xytooltips.cpp
 
 HEADERS  += mainwindow.h \
     cbarrageitem.h \
@@ -50,7 +51,8 @@ HEADERS  += mainwindow.h \
     qtsingle/qtsinglecoreapplication.h \
     xybordershadowwidget.h \
     xymenu.h \
-    xymenustyle.h
+    xymenustyle.h \
+    xytooltips.h
 
 FORMS += \
     mainwindow.ui

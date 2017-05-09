@@ -17,9 +17,6 @@ private slots:
     void showParent();
     void showContext();
     void SystemTrayActivated(QSystemTrayIcon::ActivationReason reason);//处理点击托盘操作
-
-signals:
-    void showWidget();
 };
 
 #endif // SYSTEMTRAY_H
