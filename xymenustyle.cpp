@@ -131,13 +131,8 @@ void XYMenuStyle::enterEvent(QEvent *event)
 {
     XYMenu *parent = (XYMenu *)this->parentWidget();
     parent->mopCurrentChecked = this;
-    update();
+    parent->updateCheckedMenu();
     parent->execMenu2(this);
-}
-
-void XYMenuStyle::leaveEvent(QEvent *event)
-{
-    update();
 }
 
 void XYMenuStyle::mouseReleaseEvent(QMouseEvent *event)

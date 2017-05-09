@@ -88,6 +88,14 @@ void XYMenu::raise()
     SetFocus((HWND)this->winId());
 }
 
+void XYMenu::updateCheckedMenu()
+{
+    for (int i = 0; i < mlistWidgets.size(); ++i)
+    {
+        mlistWidgets.at(i)->update();
+    }
+}
+
 int XYMenu::exec(XYMenu *parent)
 {
     // 判断是否传入空指针

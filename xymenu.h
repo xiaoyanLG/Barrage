@@ -24,6 +24,7 @@ public:
 public slots:
     int exec();
     void raise();
+    void updateCheckedMenu();
     int exec(XYMenu *parent);
     bool close(bool closeParent = false);
     void setTitle(const QString &title);
