@@ -45,6 +45,10 @@ void XYToolTips::showToolTips(const QString &tooltips)
 void XYToolTips::showToolTips(const QString &tooltips, const QPoint &pos)
 {
     XYToolTips *toolwd = getInstance();
+    if (!toolwd->isHidden())
+    {
+        toolwd->close();
+    }
     toolwd->msToolTips = tooltips;
     QFontMetrics metrics(qApp->font());
     int w = metrics.width(tooltips) + 5;

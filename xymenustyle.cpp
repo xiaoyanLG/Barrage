@@ -1,4 +1,5 @@
 ﻿#include "xymenustyle.h"
+#include "xytooltips.h"
 #include <QPainter>
 #include <QMouseEvent>
 #include <QAction>
@@ -24,6 +25,24 @@ XYMenuStyle::XYMenuStyle(XYMenu *menu, QWidget *parent)
 XYMenuStyle::~XYMenuStyle()
 {
 
+}
+
+bool XYMenuStyle::event(QEvent *event)
+{
+    if (event->type() == QEvent::ToolTip)
+    {
+        if (mbIsMenu)
+        {
+            XYToolTips::showToolTips(mopMenu->title());
+        }
+        else
+        {
+            XYToolTips::showToolTips(mopAction->text());
+        }
+        return true;
+    }
+
+    return QWidget::event(event);
 }
 
 void XYMenuStyle::paintEvent(QPaintEvent *event)
@@ -165,6 +184,10 @@ void XYMenuStyle::mouseReleaseEvent(QMouseEvent *event)
     }
     else
     {
+        if (mopMenu->isHidden())
+        {
+            mopMenu->show();
+        }
         mopMenu->raise();
     }
     event->accept();

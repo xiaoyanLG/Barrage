@@ -13,6 +13,7 @@ public:
     ~XYMenuStyle();
 
 protected:
+    bool event(QEvent *event);
     void paintEvent(QPaintEvent *event);
     void enterEvent(QEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
