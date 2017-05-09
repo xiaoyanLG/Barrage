@@ -242,6 +242,7 @@ void MainWindow::insertImage()
         connect(widget, SIGNAL(clicked(QString)), this, SLOT(insertImage(QString)));
     }
     widget->show();
+    widget->raise();
 }
 
 void MainWindow::timerShot(int number)
