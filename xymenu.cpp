@@ -63,7 +63,7 @@ XYMenu::~XYMenu()
 int XYMenu::exec()
 {
     setupUI();
-    QPoint pos = QCursor::pos();
+    QPoint pos = QCursor::pos() - QPoint(12, 12); // 为了让弹出的菜单包含鼠标
     show();
     // show 出来以后才能获取正确的窗口大小
     int width = this->width();
