@@ -1,13 +1,13 @@
-#ifndef CEMOTICONWIDGET_H
+﻿#ifndef CEMOTICONWIDGET_H
 #define CEMOTICONWIDGET_H
 
 #include <QDialog>
 
-class CEmoticonWidget : public QDialog
+class XYEmoticonWidget : public QDialog
 {
     Q_OBJECT
 public:
-    explicit CEmoticonWidget(QWidget *parent = 0);
+    explicit XYEmoticonWidget(QWidget *parent = 0);
 
 public slots:
     void openImage();

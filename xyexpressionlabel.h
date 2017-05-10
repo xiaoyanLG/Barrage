@@ -1,13 +1,13 @@
-#ifndef QEXPRESSIONLABEL_H
+﻿#ifndef QEXPRESSIONLABEL_H
 #define QEXPRESSIONLABEL_H
 
 #include <QLabel>
 
-class QExpressionLabel : public QLabel
+class XYExpressionLabel : public QLabel
 {
     Q_OBJECT
 public:
-    QExpressionLabel(QWidget *parent = NULL);
+    XYExpressionLabel(QWidget *parent = NULL);
 
 signals:
     void clicked(const QString &filename);

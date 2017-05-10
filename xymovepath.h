@@ -3,17 +3,18 @@
 
 #include <QPoint>
 #include <QRectF>
+#include <QList>
 
-struct CPoint {
+struct XYPoint {
     qreal x;
     qreal y;
 };
 
-class CShapeCircle
+class XYShapeCircle
 {
 public:
-    CShapeCircle(const QPoint &centre, qreal radius);
-    CShapeCircle(const QPoint &centre, const QPoint &point);
+    XYShapeCircle(const QPoint &centre, qreal radius);
+    XYShapeCircle(const QPoint &centre, const QPoint &point);
 
     QList<QPoint> getPoint(qreal x, bool isX = true);
 
@@ -22,14 +23,14 @@ private:
     QPoint moCentre;
 };
 
-class CMovePath
+class XYMovePath
 {
 public:
     enum TYPE {LINE, CURVE, TRIGON, RECT, ELLIPSE, ARC, UDF};
-    CMovePath(TYPE type = UDF);
-    CMovePath(const QPoint &start, const QPoint &moEnd, TYPE meType = LINE);
-    CMovePath(const QPoint &start, const QPoint &moLeftCentre, const QPoint &moRightCentre);
-    void QtoCPoint(CPoint &p1, const QPoint &p2);
+    XYMovePath(TYPE type = UDF);
+    XYMovePath(const QPoint &start, const QPoint &moEnd, TYPE meType = LINE);
+    XYMovePath(const QPoint &start, const QPoint &moLeftCentre, const QPoint &moRightCentre);
+    void QtoCPoint(XYPoint &p1, const QPoint &p2);
     void setType(TYPE type);
     void setSetp(qreal setp);
     void setLine(const QPoint &start, const QPoint &end);
@@ -38,29 +39,29 @@ public:
     void setRect(const QPoint &start, const QPoint &rect);
     void setCentre(const QPoint &start, const QPoint &moCentre);
     void setEllipse(const QPoint &start, const QPoint &moLeftCentre, const QPoint &moRightCentre);
-    ~CMovePath();
+    ~XYMovePath();
 
     virtual QPoint getPoint(qreal step, bool *success = NULL); // step must between 0 and 1.
 
-    static qreal lengthToPoint(const CPoint &p1, const CPoint &p2);
+    static qreal lengthToPoint(const XYPoint &p1, const XYPoint &p2);
     static qreal lengthToPoint(const QPoint &p1, const QPoint &p2);
 protected:
     qreal  mfStep;
-    CPoint moStartPoint;
+    XYPoint moStartPoint;
     TYPE   meType;
 
 private:
     union{
-        CPoint moEnd;    // 线段
-        CPoint moCentre; // 圆
-        CPoint moRect;   // 矩形
+        XYPoint moEnd;    // 线段
+        XYPoint moCentre; // 圆
+        XYPoint moRect;   // 矩形
         struct {       // 三角形
-            CPoint moPointB;
-            CPoint moPointC;
+            XYPoint moPointB;
+            XYPoint moPointC;
         };
         struct {       // 椭圆
-            CPoint moLeftCentre;
-            CPoint moRightCentre;
+            XYPoint moLeftCentre;
+            XYPoint moRightCentre;
         };
     };
 };

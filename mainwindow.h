@@ -9,7 +9,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class CBarrageItem;
+class XYBarrageItem;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -20,7 +20,7 @@ public:
     QFont getFont();
 
     ~MainWindow();
-    CBarrageItem *getItem(int time = 0);
+    XYBarrageItem *getItem(int time = 0);
 
 public slots:
     void addItem();
@@ -37,7 +37,7 @@ protected:
 
 private:
     static  MainWindow  *mopInstance;
-    Ui::MainWindow *ui;
+    Ui::MainWindow      *ui;
     int                  miTimer;
     int                  miLoopShot;
 

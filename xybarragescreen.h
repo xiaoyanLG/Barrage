@@ -2,20 +2,20 @@
 #define CBARRAGESCREEN_H
 
 #include <QWidget>
-#include "cbarrageitem.h"
+#include "xybarrageitem.h"
 #include <QList>
 
-class CBarrageScreen : public QWidget
+class XYBarrageScreen : public QWidget
 {
     Q_OBJECT
 public:
-    ~CBarrageScreen();
-    static CBarrageScreen *getScreen();
+    ~XYBarrageScreen();
+    static XYBarrageScreen *getScreen();
     bool forceTop();
 
 public slots:
-    void addItem(CBarrageItem *item);
-    void delItem(CBarrageItem *item);
+    void addItem(XYBarrageItem *item);
+    void delItem(XYBarrageItem *item);
     void setMaxBarrageNumber(int max);
     void changeForceTop();
     void setForceTop(bool top);
@@ -25,11 +25,11 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
-    explicit CBarrageScreen(QWidget *parent = 0);
+    explicit XYBarrageScreen(QWidget *parent = 0);
 
 private:
-    QList<CBarrageItem *> mlistBarrageItems;
-    static CBarrageScreen *mopInstance;
+    QList<XYBarrageItem *> mlistBarrageItems;
+    static XYBarrageScreen *mopInstance;
 
     int                   miMaxBarrageNumber;
     int                   miRefreshTimer;

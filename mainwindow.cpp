@@ -1,9 +1,9 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "cbarragescreen.h"
+#include "xybarragescreen.h"
 #include <QTime>
-#include "systemtray.h"
-#include "cdrawwidget.h"
+#include "xysystemtray.h"
+#include "xydrawwidget.h"
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QFileDialog>
@@ -12,11 +12,9 @@
 #include <QFileInfo>
 #include <QTimer>
 #include <QTextDocumentWriter>
-#include "cemoticonwidget.h"
-#include "csignalbarragescreen.h"
+#include "xyemoticonwidget.h"
+#include "xysignalbarragescreen.h"
 #include "xytooltips.h"
-
-#include <QDebug>
 
 MainWindow *MainWindow::mopInstance = NULL;
 MainWindow *MainWindow::instance()
@@ -28,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    SystemTray *tray = new SystemTray(this);
+    XYSystemTray *tray = new XYSystemTray(this);
     tray->show();
     ui->setupUi(this);
     connect(ui->pushButton_send, SIGNAL(clicked()), this, SLOT(addItem()));
@@ -38,8 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->pushButton_add, SIGNAL(clicked()), this, SLOT(addAnimation()));
 
     miTimer = startTimer(1000*60);
-        ui->textEdit->clear();
-        insertImage(":/Gif/60");
+    ui->textEdit->clear();
+    insertImage(":/Gif/60");
     resize(1000, 700);
     mopInstance = this;
 }
@@ -54,17 +52,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-CBarrageItem *MainWindow::getItem(int time)
+XYBarrageItem *MainWindow::getItem(int time)
 {
     qsrand(QTime::currentTime().msecsTo(QTime(0, 0)) + time * 99);
-    CBarrageItem *item = new CBarrageItem;
+    XYBarrageItem *item = new XYBarrageItem;
     item->setShowTimes(ui->lineEdit_time->text().toInt()
                        , ui->lineEdit_counts->text().toInt());
 
     QTextFrame *frame = ui->textEdit->document()->rootFrame();
     auto it = frame->begin();
-    Contents *contentsHeader = NULL;
-    Contents *contentsNext = NULL;
+    XYContents *contentsHeader = NULL;
+    XYContents *contentsNext = NULL;
     for (; !it.atEnd(); ++it)
     {
         QTextBlock block = it.currentBlock();
@@ -83,8 +81,8 @@ CBarrageItem *MainWindow::getItem(int time)
                     {
                         if (format.toImageFormat().isValid())
                         {
-                            Contents *next = new Contents;
-                            next->type = Contents::PIXMAP;
+                            XYContents *next = new XYContents;
+                            next->type = XYContents::PIXMAP;
                             next->pixmap.setFileName(QUrl(format.toImageFormat().name()).toLocalFile());
                             if (next->pixmap.fileName().startsWith("/:/"))
                             {
@@ -109,8 +107,8 @@ CBarrageItem *MainWindow::getItem(int time)
                 }
                 else
                 {
-                    Contents *next = new Contents;
-                    next->type = Contents::TEXT;
+                    XYContents *next = new XYContents;
+                    next->type = XYContents::TEXT;
                     next->text = txt;
                     if (contentsHeader == NULL)
                     {
@@ -133,8 +131,8 @@ CBarrageItem *MainWindow::getItem(int time)
         // 添加换行符
         if (contentsHeader != NULL)
         {
-            Contents *next = new Contents;
-            next->type = Contents::LF;
+            XYContents *next = new XYContents;
+            next->type = XYContents::LF;
             next->text = "\n";
             if (contentsNext == NULL)
             {
@@ -195,14 +193,14 @@ void MainWindow::addItem()
 
 void MainWindow::addItem(int time)
 {
-    CBarrageItem *item = getItem(time);
-    CBarrageScreen::getScreen()->setMaxBarrageNumber(ui->lineEdit_max->text().toInt());
-    CBarrageScreen::getScreen()->addItem(item);
+    XYBarrageItem *item = getItem(time);
+    XYBarrageScreen::getScreen()->setMaxBarrageNumber(ui->lineEdit_max->text().toInt());
+    XYBarrageScreen::getScreen()->addItem(item);
 }
 
 void MainWindow::getPoints()
 {
-    DrawWidget draw;
+    XYDrawWidget draw;
     draw.showFullScreen();
     draw.exec();
     mlistDrawPoints = draw.getDrawPoints();
@@ -235,7 +233,7 @@ void MainWindow::insertImage(const QString &filename)
 
 void MainWindow::insertImage()
 {
-    static CEmoticonWidget *widget = new CEmoticonWidget;
+    static XYEmoticonWidget *widget = new XYEmoticonWidget;
     static bool first = true;
     if (first)
     {
@@ -256,7 +254,7 @@ void MainWindow::timerShot(int number)
 
 void MainWindow::addAnimation()
 {
-    CSignalBarrageScreen *signalScreen = new CSignalBarrageScreen;
+    XYSignalBarrageScreen *signalScreen = new XYSignalBarrageScreen;
     signalScreen->setItem(getItem());
     signalScreen->show();
 }

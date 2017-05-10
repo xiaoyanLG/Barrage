@@ -1,9 +1,9 @@
-﻿#include "cbarrageitem.h"
-#include "cbarragescreen.h"
+﻿#include "xybarrageitem.h"
+#include "xybarragescreen.h"
 #include <QPropertyAnimation>
 #include <QtMath>
-#include <QDebug>
-CBarrageItem::CBarrageItem(Contents *contents,
+
+XYBarrageItem::XYBarrageItem(XYContents *contents,
                            int showTimes,
                            const QColor &textColor,
                            const QFont &textFont,
@@ -27,19 +27,18 @@ CBarrageItem::CBarrageItem(Contents *contents,
     setShowTimes(showTimes, miLoopCounts);
 }
 
-CBarrageItem::~CBarrageItem()
+XYBarrageItem::~XYBarrageItem()
 {
-    qDebug() << QStringLiteral("析构弹幕内容");
-    Contents *contents = mopContents;
+    XYContents *contents = mopContents;
     while (contents)
     {
-        Contents *next = contents->next;
+        XYContents *next = contents->next;
         delete contents;
         contents = next;
     }
 }
 
-QPoint CBarrageItem::getCurrentPos()
+QPoint XYBarrageItem::getCurrentPos()
 {
     if (mopMoveAnimation == NULL)
     {
@@ -91,12 +90,108 @@ QPoint CBarrageItem::getCurrentPos()
     }
 }
 
-qreal CBarrageItem::getCurrentOpacity()
+qreal XYBarrageItem::getCurrentOpacity()
 {
     return getOpactiy();
 }
 
-void CBarrageItem::setAnimation(const QEasingCurve &type)
+int XYBarrageItem::getContentsWidth()
+{
+    int width = this->miBarrageWidth;
+    if (width == -1)
+    {
+        width = 0;
+        XYContents *contents = this->mopContents;
+        int w = 0;
+        while (contents)
+        {
+            switch (contents->type)
+            {
+            case XYContents::TEXT:
+            {
+                QFontMetrics metrics(this->moTextFont);
+                w += metrics.width(contents->text) + 2;
+                break;
+            }
+            case XYContents::LF:
+                width = qMax(w, width);
+                w = 0;
+                break;
+            case XYContents::PIXMAP:
+                if (!contents->pixmap.isValid())
+                {
+                    QString filename = contents->pixmap.fileName();
+                    w += QPixmap(filename).width() + 1;
+                }
+                else if (contents->pixmap.state() != QMovie::Running)
+                {
+                    contents->pixmap.start();
+                    w += contents->pixmap.currentPixmap().width() + 1;
+                }
+                else
+                {
+                    w += contents->pixmap.currentPixmap().width() + 1;
+                }
+                break;
+            default:
+                break;
+            }
+            contents = contents->next;
+        }
+    }
+
+    return width;
+}
+
+int XYBarrageItem::getContentsHeight()
+{
+    int height = this->miBarrageHeight;
+    if (height == -1)
+    {
+        height = 0;
+        XYContents *contents = this->mopContents;
+        int h = 0;
+        while (contents)
+        {
+            switch (contents->type)
+            {
+            case XYContents::TEXT:
+            {
+                QFontMetrics metrics(this->moTextFont);
+                h = qMax(h, metrics.height() + 2);
+                break;
+            }
+            case XYContents::LF:
+                height += h;
+                h = 0;
+                break;
+            case XYContents::PIXMAP:
+                if (!contents->pixmap.isValid())
+                {
+                    QString filename = contents->pixmap.fileName();
+                    h = qMax(h, QPixmap(filename).height() + 1);
+                }
+                else if (contents->pixmap.state() != QMovie::Running)
+                {
+                    contents->pixmap.start();
+                    h = qMax(h, contents->pixmap.currentPixmap().height() + 1);
+                }
+                else
+                {
+                    h = qMax(h, contents->pixmap.currentPixmap().height() + 1);
+                }
+                break;
+            default:
+                break;
+            }
+            contents = contents->next;
+        }
+    }
+
+    return height;
+}
+
+void XYBarrageItem::setAnimation(const QEasingCurve &type)
 {
     mopMoveAnimation = new QPropertyAnimation(this, "pos");
     mopMoveAnimation->setLoopCount(miLoopCounts);
@@ -122,13 +217,12 @@ void CBarrageItem::setAnimation(const QEasingCurve &type)
     mopOpactiyAnimation->setEndValue(0);
 }
 
-QPoint CBarrageItem::getPos() const
+QPoint XYBarrageItem::getPos() const
 {
-//    qDebug() << moCurrentPos;
     return moCurrentPos;
 }
 
-void CBarrageItem::setPos(const QPoint &pos)
+void XYBarrageItem::setPos(const QPoint &pos)
 {
     if (moCurrentPos != pos)
     {
@@ -136,13 +230,12 @@ void CBarrageItem::setPos(const QPoint &pos)
     }
 }
 
-qreal CBarrageItem::getOpactiy() const
+qreal XYBarrageItem::getOpactiy() const
 {
-//    qDebug() << mfOpactiy;
     return mfOpactiy;
 }
 
-void CBarrageItem::setOpactiy(qreal opactiy)
+void XYBarrageItem::setOpactiy(qreal opactiy)
 {
     if (mfOpactiy != opactiy)
     {
@@ -150,7 +243,7 @@ void CBarrageItem::setOpactiy(qreal opactiy)
     }
 }
 
-bool CBarrageItem::isFinished()
+bool XYBarrageItem::isFinished()
 {
     if (mopMoveAnimation != NULL)
     {
@@ -181,14 +274,14 @@ bool CBarrageItem::isFinished()
     }
 }
 
-qreal CBarrageItem::lengthToPoint(const QPoint &p1, const QPoint &p2)
+qreal XYBarrageItem::lengthToPoint(const QPoint &p1, const QPoint &p2)
 {
     qreal x = qFabs(p1.x() - p2.x());
     qreal y = qFabs(p1.y() - p2.y());
     return qSqrt((x*x) + (y*y));
 }
 
-void CBarrageItem::setShowTimes(int showTimes, int counts)
+void XYBarrageItem::setShowTimes(int showTimes, int counts)
 {
     miShowTimes = showTimes;
     miLoopCounts = counts;
@@ -217,27 +310,27 @@ void CBarrageItem::setShowTimes(int showTimes, int counts)
     }
 }
 
-void CBarrageItem::setContents(Contents *contents)
+void XYBarrageItem::setContents(XYContents *contents)
 {
     mopContents = contents;
 }
 
-void CBarrageItem::setTextColor(const QColor &textColor)
+void XYBarrageItem::setTextColor(const QColor &textColor)
 {
     moTextColor = textColor;
 }
 
-void CBarrageItem::setTextFont(const QFont &textFont)
+void XYBarrageItem::setTextFont(const QFont &textFont)
 {
     moTextFont = textFont;
 }
 
-void CBarrageItem::setStartPos(const QPoint &startPos)
+void XYBarrageItem::setStartPos(const QPoint &startPos)
 {
     moStartPos = startPos;
     if (moStartPos.isNull())
     {
-        CBarrageScreen *screen = CBarrageScreen::getScreen();
+        XYBarrageScreen *screen = XYBarrageScreen::getScreen();
         if (screen)
         {
             moStartPos = QPoint(screen->width(), 50);
@@ -247,30 +340,30 @@ void CBarrageItem::setStartPos(const QPoint &startPos)
     mfCurrentY = moStartPos.y();
     if (moEndPos.isNull())
     {
-        moEndPos = QPoint(-msContents.toLocal8Bit().length() * moTextFont.pointSize()
+        moEndPos = QPoint(- getContentsWidth()
                           , moStartPos.y());
     }
     setShowTimes(miShowTimes, miLoopCounts);
 }
 
-void CBarrageItem::setEndPos(const QPoint &endPos)
+void XYBarrageItem::setEndPos(const QPoint &endPos)
 {
     moEndPos = endPos;
     if (moEndPos.isNull())
     {
-        moEndPos = QPoint(- msContents.toLocal8Bit().length() * moTextFont.pointSize()
+        moEndPos = QPoint(- getContentsWidth()
                           , moStartPos.y());
     }
     setShowTimes(miShowTimes, miLoopCounts);
 }
 
-void CBarrageItem::setBarrageSize(int barrageWidth, int barrageHeight)
+void XYBarrageItem::setBarrageSize(int barrageWidth, int barrageHeight)
 {
     miBarrageWidth  = barrageWidth;
     miBarrageHeight = barrageHeight;
 }
 
-void CBarrageItem::setDrawPoints(const QList<QPoint> &points)
+void XYBarrageItem::setDrawPoints(const QList<QPoint> &points)
 {
     mlistDrawPoints = points;
     if (!mlistDrawPoints.isEmpty())
@@ -290,7 +383,7 @@ void CBarrageItem::setDrawPoints(const QList<QPoint> &points)
     }
 }
 
-void CBarrageItem::setBackImage(const QMovie &image)
+void XYBarrageItem::setBackImage(const QMovie &image)
 {
     if (image.isValid())
     {

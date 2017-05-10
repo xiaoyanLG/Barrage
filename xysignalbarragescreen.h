@@ -1,29 +1,32 @@
 ﻿#ifndef CSIGNALBARRAGESCREEN_H
 #define CSIGNALBARRAGESCREEN_H
 
-#include "cmousemonitorwidget.h"
-#include "cbarrageitem.h"
-#include "cmovepath.h"
+#include "xymousemonitor.h"
+#include "xybarrageitem.h"
+#include "xymovepath.h"
+#include <QWidget>
 
-class CSignalBarrageScreen : public CMouseMonitorWidget
+class XYSignalBarrageScreen : public QWidget, public XYMouseMonitor
 {
     Q_OBJECT
     Q_PROPERTY(qreal step READ step WRITE setStep)
 public:
-    explicit CSignalBarrageScreen(CBarrageItem *item = NULL, QWidget *parent = 0);
-    ~CSignalBarrageScreen();
+    explicit XYSignalBarrageScreen(XYBarrageItem *item = NULL, QWidget *parent = 0);
+    ~XYSignalBarrageScreen();
+    static void deleteAllAnimations();
 
     qreal step() const;
     void setStep(qreal step);
 
 public slots:
-    void setItem(CBarrageItem *item);
+    void setItem(XYBarrageItem *item);
     void changeFixed();
     void changeForceTop();
     void changeAutoMove();
     void moveNextPoint();
     void changeMouseThrough();
     void choiseMovePath();
+    void changeRandomCall();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -32,15 +35,14 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
-
-public slots:
-    void clicked(QPoint point);
+    void clicked(const QPoint &point);
 
 private:
+    static QList<XYSignalBarrageScreen *> allSignalScreens;
     QPropertyAnimation *mopMoveAnimation;
     QPropertyAnimation *mopStepAnimation;
-    CBarrageItem *mopContentsItem;
-    CMovePath     moMovePath;
+    XYBarrageItem *mopContentsItem;
+    XYMovePath     moMovePath;
     qreal         mfStep;
 
     bool          mbFixed;
@@ -50,6 +52,7 @@ private:
     bool          mbLeftMousePressed;
     bool          mbForceTop;
     bool          mbMouseThrough;
+    bool          mbRandomCall;
     QPoint        moLastPos;
     long          miWindowLong;
 

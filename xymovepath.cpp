@@ -1,20 +1,19 @@
-﻿#include "cmovepath.h"
+﻿#include "xymovepath.h"
 #include <QtMath>
-#include <QDebug>
 
-CShapeCircle::CShapeCircle(const QPoint &centre, qreal radius)
+XYShapeCircle::XYShapeCircle(const QPoint &centre, qreal radius)
 {
     moCentre = centre;
     mfRadius = radius;
 }
 
-CShapeCircle::CShapeCircle(const QPoint &centre, const QPoint &point)
+XYShapeCircle::XYShapeCircle(const QPoint &centre, const QPoint &point)
 {
     moCentre = centre;
-    mfRadius = CMovePath::lengthToPoint(centre, point);
+    mfRadius = XYMovePath::lengthToPoint(centre, point);
 }
 
-QList<QPoint> CShapeCircle::getPoint(qreal x, bool isX)
+QList<QPoint> XYShapeCircle::getPoint(qreal x, bool isX)
 {
     qreal other = 0;
     int length = 0;
@@ -41,13 +40,13 @@ QList<QPoint> CShapeCircle::getPoint(qreal x, bool isX)
     }
 }
 
-CMovePath::CMovePath(CMovePath::TYPE type)
+XYMovePath::XYMovePath(XYMovePath::TYPE type)
 {
     this->meType = type;
     this->mfStep = 0;
 }
 
-CMovePath::CMovePath(const QPoint &start, const QPoint &end, CMovePath::TYPE type)
+XYMovePath::XYMovePath(const QPoint &start, const QPoint &end, XYMovePath::TYPE type)
 {
     QtoCPoint(this->moStartPoint, start);
     switch (type)
@@ -69,7 +68,7 @@ CMovePath::CMovePath(const QPoint &start, const QPoint &end, CMovePath::TYPE typ
     this->mfStep = 1;
 }
 
-CMovePath::CMovePath(const QPoint &start, const QPoint &leftCentre, const QPoint &rightCentre)
+XYMovePath::XYMovePath(const QPoint &start, const QPoint &leftCentre, const QPoint &rightCentre)
 {
     QtoCPoint(this->moStartPoint, start);
     QtoCPoint(this->moLeftCentre, leftCentre);
@@ -78,23 +77,23 @@ CMovePath::CMovePath(const QPoint &start, const QPoint &leftCentre, const QPoint
     this->mfStep = 1;
 }
 
-void CMovePath::QtoCPoint(CPoint &p1, const QPoint &p2)
+void XYMovePath::QtoCPoint(XYPoint &p1, const QPoint &p2)
 {
     p1.x = p2.x();
     p1.y = p2.y();
 }
 
-void CMovePath::setType(CMovePath::TYPE type)
+void XYMovePath::setType(XYMovePath::TYPE type)
 {
     this->meType = type;
 }
 
-void CMovePath::setSetp(qreal setp)
+void XYMovePath::setSetp(qreal setp)
 {
     this->mfStep = setp;
 }
 
-void CMovePath::setLine(const QPoint &start, const QPoint &end)
+void XYMovePath::setLine(const QPoint &start, const QPoint &end)
 {
     QtoCPoint(this->moStartPoint, start);
     QtoCPoint(this->moEnd, end);
@@ -102,7 +101,7 @@ void CMovePath::setLine(const QPoint &start, const QPoint &end)
     this->mfStep = 1;
 }
 
-void CMovePath::setCurve(const QPoint &start, const QPoint &end)
+void XYMovePath::setCurve(const QPoint &start, const QPoint &end)
 {
     QtoCPoint(this->moStartPoint, start);
     QtoCPoint(this->moEnd, end);
@@ -110,7 +109,7 @@ void CMovePath::setCurve(const QPoint &start, const QPoint &end)
     this->mfStep = 1;
 }
 
-void CMovePath::setTrigon(const QPoint &start, const QPoint &p1, const QPoint &p2)
+void XYMovePath::setTrigon(const QPoint &start, const QPoint &p1, const QPoint &p2)
 {
     QtoCPoint(this->moStartPoint, start);
     QtoCPoint(this->moPointB, p1);
@@ -119,7 +118,7 @@ void CMovePath::setTrigon(const QPoint &start, const QPoint &p1, const QPoint &p
     this->mfStep = 1;
 }
 
-void CMovePath::setRect(const QPoint &start, const QPoint &rect)
+void XYMovePath::setRect(const QPoint &start, const QPoint &rect)
 {
     QtoCPoint(this->moStartPoint, start);
     QtoCPoint(this->moRect, rect);
@@ -127,7 +126,7 @@ void CMovePath::setRect(const QPoint &start, const QPoint &rect)
     this->mfStep = 1;
 }
 
-void CMovePath::setCentre(const QPoint &start, const QPoint &centre)
+void XYMovePath::setCentre(const QPoint &start, const QPoint &centre)
 {
     QtoCPoint(this->moStartPoint, start);
     QtoCPoint(this->moCentre, centre);
@@ -135,7 +134,7 @@ void CMovePath::setCentre(const QPoint &start, const QPoint &centre)
     this->mfStep = 1;
 }
 
-void CMovePath::setEllipse(const QPoint &start, const QPoint &leftCentre, const QPoint &rightCentre)
+void XYMovePath::setEllipse(const QPoint &start, const QPoint &leftCentre, const QPoint &rightCentre)
 {
     QtoCPoint(this->moStartPoint, start);
     QtoCPoint(this->moLeftCentre, leftCentre);
@@ -144,12 +143,12 @@ void CMovePath::setEllipse(const QPoint &start, const QPoint &leftCentre, const 
     this->mfStep = 1;
 }
 
-CMovePath::~CMovePath()
+XYMovePath::~XYMovePath()
 {
 
 }
 
-QPoint CMovePath::getPoint(qreal step, bool *success)
+QPoint XYMovePath::getPoint(qreal step, bool *success)
 {
     if (step < 0 || step > 1)
     {
@@ -221,10 +220,10 @@ QPoint CMovePath::getPoint(qreal step, bool *success)
     }
     case RECT: // 矩形
     {
-        CPoint A = moStartPoint;
-        CPoint B = moEnd;
-        CPoint C = CPoint{B.x, A.y};
-        CPoint D = CPoint{A.x, B.y};
+        XYPoint A = moStartPoint;
+        XYPoint B = moEnd;
+        XYPoint C = XYPoint{B.x, A.y};
+        XYPoint D = XYPoint{A.x, B.y};
 
         qreal AC = lengthToPoint(A, C);
         qreal AD = lengthToPoint(A, D);
@@ -343,14 +342,14 @@ QPoint CMovePath::getPoint(qreal step, bool *success)
     return QPoint(x, y);
 }
 
-qreal CMovePath::lengthToPoint(const CPoint &p1, const CPoint &p2)
+qreal XYMovePath::lengthToPoint(const XYPoint &p1, const XYPoint &p2)
 {
     qreal x = qAbs(p1.x - p2.x);
     qreal y = qAbs(p1.y - p2.y);
     return qSqrt((x*x) + (y*y));
 }
 
-qreal CMovePath::lengthToPoint(const QPoint &p1, const QPoint &p2)
+qreal XYMovePath::lengthToPoint(const QPoint &p1, const QPoint &p2)
 {
     qreal x = qAbs(p1.x() - p2.x());
     qreal y = qAbs(p1.y() - p2.y());

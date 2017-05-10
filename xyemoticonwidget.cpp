@@ -1,20 +1,20 @@
-#include "cemoticonwidget.h"
+﻿#include "xyemoticonwidget.h"
+#include "xyexpressionlabel.h"
 #include <QGridLayout>
 #include <QVBoxLayout>
-#include "qexpressionlabel.h"
 #include <QMovie>
 #include <QScrollArea>
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QFileDialog>
 
-CEmoticonWidget::CEmoticonWidget(QWidget *parent)
+XYEmoticonWidget::XYEmoticonWidget(QWidget *parent)
     : QDialog(parent)
 { 
     QGridLayout *layout = new QGridLayout;
     for (int i = 0; i < 88; ++i)
     {
-        QExpressionLabel *label = new QExpressionLabel;
+        XYExpressionLabel *label = new XYExpressionLabel;
         connect(label, SIGNAL(clicked(QString)), this, SIGNAL(clicked(QString)));
         QMovie *move = new QMovie;
         move->setFileName(QString(":/Gif/%1").arg(i));
@@ -24,7 +24,7 @@ CEmoticonWidget::CEmoticonWidget(QWidget *parent)
     }
     for (int i = 0; i < 66; ++i)
     {
-        QExpressionLabel *label = new QExpressionLabel;
+        XYExpressionLabel *label = new XYExpressionLabel;
         connect(label, SIGNAL(clicked(QString)), this, SIGNAL(clicked(QString)));
         QMovie *move = new QMovie;
         move->setFileName(QString(":/Gif1/%1").arg(i));
@@ -34,7 +34,7 @@ CEmoticonWidget::CEmoticonWidget(QWidget *parent)
     }
     for (int i = 0; i < 104; ++i)
     {
-        QExpressionLabel *label = new QExpressionLabel;
+        XYExpressionLabel *label = new XYExpressionLabel;
         connect(label, SIGNAL(clicked(QString)), this, SIGNAL(clicked(QString)));
         QMovie *move = new QMovie;
         move->setFileName(QString(":/Gif2/%1").arg(i));
@@ -61,7 +61,7 @@ CEmoticonWidget::CEmoticonWidget(QWidget *parent)
     resize(900, 600);
 }
 
-void CEmoticonWidget::openImage()
+void XYEmoticonWidget::openImage()
 {
     QString imageFile = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                      QString(),

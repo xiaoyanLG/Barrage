@@ -7,7 +7,7 @@
 
 XYToolTips *XYToolTips::mopInstance = NULL;
 XYToolTips::XYToolTips(QWidget *parent)
-    : XYBorderShadowWidget(parent)
+    : XYBorderShadowWidget(parent), XYMouseMonitor()
 {
     this->setWindowFlags(Qt::FramelessWindowHint
                          | Qt::WindowStaysOnTopHint
@@ -95,5 +95,10 @@ void XYToolTips::paintEvent(QPaintEvent *event)
 void XYToolTips::focusOutEvent(QFocusEvent *event)
 {
     close();
+}
+
+void XYToolTips::clicked(const QPoint &point)
+{
+    focusOutEvent(NULL);
 }
 

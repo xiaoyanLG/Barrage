@@ -3,12 +3,12 @@
 
 #include <QSystemTrayIcon>
 
-class SystemTray : public QSystemTrayIcon
+class XYSystemTray : public QSystemTrayIcon
 {
     Q_OBJECT
 public:
-    explicit SystemTray(QWidget *parent = 0);
-    ~SystemTray();
+    explicit XYSystemTray(QWidget *parent = 0);
+    ~XYSystemTray();
     void InitTyay();
 
 private slots:

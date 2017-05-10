@@ -2,6 +2,7 @@
 #define XYMENU_H
 
 #include "xybordershadowwidget.h"
+#include "xymousemonitor.h"
 #include <QIcon>
 #include <QMap>
 
@@ -9,7 +10,7 @@ class XYMenuStyle;
 class QEventLoop;
 class QVBoxLayout;
 
-class XYMenu : public XYBorderShadowWidget
+class XYMenu : public XYBorderShadowWidget, public XYMouseMonitor
 {
     Q_OBJECT
 public:
@@ -35,6 +36,7 @@ public slots:
 protected:
     void focusOutEvent(QFocusEvent *event);
     void leaveEvent(QEvent *event);
+    void clicked(const QPoint &point);
 
 private:
     void execMenu2(XYMenuStyle *style);

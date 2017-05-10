@@ -15,15 +15,6 @@ INCLUDEPATH += qtsingle/
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    cbarrageitem.cpp \
-    cbarragescreen.cpp \
-    systemtray.cpp \
-    cdrawwidget.cpp \
-    cemoticonwidget.cpp \
-    qexpressionlabel.cpp \
-    cmousemonitorwidget.cpp \
-    csignalbarragescreen.cpp \
-    cmovepath.cpp \
     qtsingle/qtlocalpeer.cpp \
     qtsingle/qtlockedfile.cpp \
     qtsingle/qtlockedfile_win.cpp \
@@ -33,18 +24,18 @@ SOURCES += main.cpp\
     xybordershadowwidget.cpp \
     xymenu.cpp \
     xymenustyle.cpp \
-    xytooltips.cpp
+    xytooltips.cpp \
+    xymousemonitor.cpp \
+    xymovepath.cpp \
+    xysignalbarragescreen.cpp \
+    xybarrageitem.cpp \
+    xybarragescreen.cpp \
+    xydrawwidget.cpp \
+    xyemoticonwidget.cpp \
+    xyexpressionlabel.cpp \
+    xysystemtray.cpp
 
 HEADERS  += mainwindow.h \
-    cbarrageitem.h \
-    cbarragescreen.h \
-    systemtray.h \
-    cdrawwidget.h \
-    cemoticonwidget.h \
-    qexpressionlabel.h \
-    cmousemonitorwidget.h \
-    csignalbarragescreen.h \
-    cmovepath.h \
     qtsingle/qtlocalpeer.h \
     qtsingle/qtlockedfile.h \
     qtsingle/qtsingleapplication.h \
@@ -52,7 +43,16 @@ HEADERS  += mainwindow.h \
     xybordershadowwidget.h \
     xymenu.h \
     xymenustyle.h \
-    xytooltips.h
+    xytooltips.h \
+    xymousemonitor.h \
+    xymovepath.h \
+    xysignalbarragescreen.h \
+    xybarrageitem.h \
+    xybarragescreen.h \
+    xydrawwidget.h \
+    xyemoticonwidget.h \
+    xyexpressionlabel.h \
+    xysystemtray.h
 
 FORMS += \
     mainwindow.ui

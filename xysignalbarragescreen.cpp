@@ -1,27 +1,30 @@
-﻿#include "csignalbarragescreen.h"
+﻿#include "xysignalbarragescreen.h"
 #include "xymenu.h"
 #include "xytooltips.h"
 #include <QPainter>
+#include <QAction>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QTime>
-#include <QMenu>
-#include <QContextMenuEvent>
 #include <QMouseEvent>
+#include <Windows.h>
 #include <QDebug>
-CSignalBarrageScreen::CSignalBarrageScreen(CBarrageItem *item, QWidget *parent)
-    : CMouseMonitorWidget(parent)
+QList<XYSignalBarrageScreen *> XYSignalBarrageScreen::allSignalScreens;
+XYSignalBarrageScreen::XYSignalBarrageScreen(XYBarrageItem *item, QWidget *parent)
+    : QWidget(parent), XYMouseMonitor()
 {
     this->setWindowFlags(Qt::FramelessWindowHint
                          | Qt::WindowStaysOnTopHint
                          | Qt::WindowType_Mask);
     this->setAttribute(Qt::WA_TranslucentBackground);
 
+    allSignalScreens.append(this);
     mbLeftMousePressed = false;
     mbFixed = false;
     mbAutoMove = false;
     mbForceTop = false;
     mbMouseThrough = false;
+    mbRandomCall = false;
     mopMoveAnimation = NULL;
     mopStepAnimation = NULL;
     mopContentsItem = NULL;
@@ -37,17 +40,26 @@ CSignalBarrageScreen::CSignalBarrageScreen(CBarrageItem *item, QWidget *parent)
     miRefreshTimer = startTimer(30);
 }
 
-CSignalBarrageScreen::~CSignalBarrageScreen()
+XYSignalBarrageScreen::~XYSignalBarrageScreen()
 {
     delete mopContentsItem;
+    allSignalScreens.removeAll(this);
 }
 
-qreal CSignalBarrageScreen::step() const
+void XYSignalBarrageScreen::deleteAllAnimations()
+{
+    while (!mlistAllWidget.isEmpty())
+    {
+        delete mlistAllWidget.at(0);
+    }
+}
+
+qreal XYSignalBarrageScreen::step() const
 {
     return mfStep;
 }
 
-void CSignalBarrageScreen::setStep(qreal step)
+void XYSignalBarrageScreen::setStep(qreal step)
 {
     if (mfStep != step)
     {
@@ -74,7 +86,7 @@ void CSignalBarrageScreen::setStep(qreal step)
     }
 }
 
-void CSignalBarrageScreen::setItem(CBarrageItem *item)
+void XYSignalBarrageScreen::setItem(XYBarrageItem *item)
 {
     if (mopContentsItem != NULL)
     {
@@ -83,97 +95,15 @@ void CSignalBarrageScreen::setItem(CBarrageItem *item)
     mopContentsItem = item;
     if (mopContentsItem)
     {
-        int width = mopContentsItem->miBarrageWidth;
-        if (width == -1)
-        {
-            width = 0;
-            Contents *contents = mopContentsItem->mopContents;
-            int w = 0;
-            while (contents)
-            {
-                switch (contents->type)
-                {
-                case Contents::TEXT:
-                {
-                    QFontMetrics metrics(mopContentsItem->moTextFont);
-                    w += metrics.width(contents->text) + 2;
-                    break;
-                }
-                case Contents::LF:
-                    width = qMax(w, width);
-                    w = 0;
-                    break;
-                case Contents::PIXMAP:
-                    if (!contents->pixmap.isValid())
-                    {
-                        QString filename = contents->pixmap.fileName();
-                        w += QPixmap(filename).width() + 1;
-                    }
-                    else if (contents->pixmap.state() != QMovie::Running)
-                    {
-                        contents->pixmap.start();
-                        w += contents->pixmap.currentPixmap().width() + 1;
-                    }
-                    else
-                    {
-                        w += contents->pixmap.currentPixmap().width() + 1;
-                    }
-                    break;
-                default:
-                    break;
-                }
-                contents = contents->next;
-            }
-        }
-        int height = mopContentsItem->miBarrageHeight;
-        if (height == -1)
-        {
-            height = 0;
-            Contents *contents = mopContentsItem->mopContents;
-            int h = 0;
-            while (contents)
-            {
-                switch (contents->type)
-                {
-                case Contents::TEXT:
-                {
-                    QFontMetrics metrics(mopContentsItem->moTextFont);
-                    h = qMax(h, metrics.height() + 2);
-                    break;
-                }
-                case Contents::LF:
-                    height += h;
-                    h = 0;
-                    break;
-                case Contents::PIXMAP:
-                    if (!contents->pixmap.isValid())
-                    {
-                        QString filename = contents->pixmap.fileName();
-                        h = qMax(h, QPixmap(filename).height() + 1);
-                    }
-                    else if (contents->pixmap.state() != QMovie::Running)
-                    {
-                        contents->pixmap.start();
-                        h = qMax(h, contents->pixmap.currentPixmap().height() + 1);
-                    }
-                    else
-                    {
-                        h = qMax(h, contents->pixmap.currentPixmap().height() + 1);
-                    }
-                    break;
-                default:
-                    break;
-                }
-                contents = contents->next;
-            }
-        }
+        int width  = mopContentsItem->getContentsWidth();
+        int height = mopContentsItem->getContentsHeight();
         resize(width, height);
         move(QApplication::desktop()->width() - width - 50
              , QApplication::desktop()->height() - height - 50);
     }
 }
 
-void CSignalBarrageScreen::changeFixed()
+void XYSignalBarrageScreen::changeFixed()
 {
     mbFixed = !mbFixed;
     if (mbFixed)
@@ -185,12 +115,12 @@ void CSignalBarrageScreen::changeFixed()
     }
 }
 
-void CSignalBarrageScreen::changeForceTop()
+void XYSignalBarrageScreen::changeForceTop()
 {
     mbForceTop = !mbForceTop;
 }
 
-void CSignalBarrageScreen::changeAutoMove()
+void XYSignalBarrageScreen::changeAutoMove()
 {
     mbAutoMove = !mbAutoMove;
     if (mbAutoMove)
@@ -207,7 +137,7 @@ void CSignalBarrageScreen::changeAutoMove()
     }
 }
 
-void CSignalBarrageScreen::moveNextPoint()
+void XYSignalBarrageScreen::moveNextPoint()
 {
     qsrand(QTime::currentTime().msecsTo(QTime(0, 0)) + (int)this);
     if (mopStepAnimation == NULL)
@@ -223,7 +153,6 @@ void CSignalBarrageScreen::moveNextPoint()
             index = qrand() % mmapPath.size();
         }
         QPoint curpos = pos();
-        qDebug() << __FUNCTION__ << index;
         switch (index)
         {
         case 0:
@@ -259,7 +188,7 @@ void CSignalBarrageScreen::moveNextPoint()
     mopStepAnimation->start();
 }
 
-void CSignalBarrageScreen::changeMouseThrough()
+void XYSignalBarrageScreen::changeMouseThrough()
 {
     if (GetWindowLong((HWND)winId(), GWL_EXSTYLE) == miWindowLong)
     {
@@ -274,7 +203,7 @@ void CSignalBarrageScreen::changeMouseThrough()
     }
 }
 
-void CSignalBarrageScreen::choiseMovePath()
+void XYSignalBarrageScreen::choiseMovePath()
 {
     QAction *act = (QAction *)sender();
 
@@ -291,12 +220,17 @@ void CSignalBarrageScreen::choiseMovePath()
     }
 }
 
-void CSignalBarrageScreen::paintEvent(QPaintEvent *event)
+void XYSignalBarrageScreen::changeRandomCall()
+{
+    mbRandomCall = !mbRandomCall;
+}
+
+void XYSignalBarrageScreen::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
     QPainter painter;
     painter.begin(this);
-    CBarrageItem *item = mopContentsItem;
+    XYBarrageItem *item = mopContentsItem;
     painter.setPen(item->moTextColor);
     painter.setFont(item->moTextFont);
     if (item->miBarrageWidth == -1)
@@ -318,7 +252,7 @@ void CSignalBarrageScreen::paintEvent(QPaintEvent *event)
                            pixmap,
                            pixmap.rect());
     }
-    Contents *contents = item->mopContents;
+    XYContents *contents = item->mopContents;
     qreal offset_X = 0;
     qreal offset_Y = 0;
     qreal current_Y = 0;
@@ -330,7 +264,7 @@ void CSignalBarrageScreen::paintEvent(QPaintEvent *event)
         limit_Y = item->miBarrageHeight - offset_Y;
         switch (contents->type)
         {
-        case Contents::TEXT:
+        case XYContents::TEXT:
         {
             painter.drawText(QRect(offset_X,
                                    offset_Y,
@@ -342,11 +276,12 @@ void CSignalBarrageScreen::paintEvent(QPaintEvent *event)
             current_Y = qMax(current_Y, metrics.height() + 2.0);
             break;
         }
-        case Contents::LF:
+        case XYContents::LF:
+            qDebug() << "ddd";
             offset_Y += current_Y;
             offset_X = 0;
             break;
-        case Contents::PIXMAP:
+        case XYContents::PIXMAP:
         {
             QPixmap pixmap;
             if (!contents->pixmap.isValid())
@@ -390,7 +325,7 @@ void CSignalBarrageScreen::paintEvent(QPaintEvent *event)
     painter.end();
 }
 
-void CSignalBarrageScreen::timerEvent(QTimerEvent *event)
+void XYSignalBarrageScreen::timerEvent(QTimerEvent *event)
 {
     if (miRefreshTimer == event->timerId())
     {
@@ -405,11 +340,10 @@ void CSignalBarrageScreen::timerEvent(QTimerEvent *event)
     }
 }
 
-void CSignalBarrageScreen::mousePressEvent(QMouseEvent *event)
+void XYSignalBarrageScreen::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        setCurrentInstance(this);
         if (mopMoveAnimation && mopMoveAnimation->state() == QPropertyAnimation::Running)
         {
             mopMoveAnimation->stop();
@@ -423,7 +357,7 @@ void CSignalBarrageScreen::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void CSignalBarrageScreen::mouseReleaseEvent(QMouseEvent *event)
+void XYSignalBarrageScreen::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
@@ -432,7 +366,7 @@ void CSignalBarrageScreen::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void CSignalBarrageScreen::mouseMoveEvent(QMouseEvent *event)
+void XYSignalBarrageScreen::mouseMoveEvent(QMouseEvent *event)
 {
     if (mbLeftMousePressed)
     {
@@ -444,7 +378,7 @@ void CSignalBarrageScreen::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
+void XYSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
 {
     XYMenu menu;
     QAction *exit = new QAction("Exit", &menu);
@@ -520,7 +454,7 @@ void CSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)
     menu.exec();
 }
 
-void CSignalBarrageScreen::clicked(QPoint point)
+void XYSignalBarrageScreen::clicked(const QPoint &point)
 {
     if (!mbLeftMousePressed && !mbFixed && !mbAutoMove)
     {
@@ -535,9 +469,12 @@ void CSignalBarrageScreen::clicked(QPoint point)
             mopMoveAnimation->stop();
         }
 
-        mopMoveAnimation->setEndValue(point);
-        mopMoveAnimation->setDuration(5000);
-        mopMoveAnimation->setEasingCurve(QEasingCurve::Type(qrand() % 40));
-        mopMoveAnimation->start();
+        if (!mbRandomCall || qrand() % 2)
+        {
+            mopMoveAnimation->setEndValue(point);
+            mopMoveAnimation->setDuration(5000);
+            mopMoveAnimation->setEasingCurve(QEasingCurve::Type(qrand() % 40));
+            mopMoveAnimation->start();
+        }
     }
 }

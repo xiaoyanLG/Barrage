@@ -8,23 +8,23 @@
 #include <QPropertyAnimation>
 #include <QTimerEvent>
 
-class Contents
+class XYContents
 {
 public:
     enum {NONE, TEXT, LF, PIXMAP};
 
-    Contents()
+    XYContents()
     {
         type = NONE;
         next = NULL;
     }
-    Contents(const QString &text)
+    XYContents(const QString &text)
     {
         type = TEXT;
         this->text = text;
         next = NULL;
     }
-    Contents(const QMovie &pixmap)
+    XYContents(const QMovie &pixmap)
     {
         type = PIXMAP;
         if (pixmap.isValid())
@@ -40,24 +40,27 @@ public:
     QString text;
     QMovie  pixmap;
 
-    Contents *next;
+    XYContents *next;
 };
 
-class CBarrageItem : public QObject
+class XYBarrageItem : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QPoint pos READ getPos WRITE setPos)
     Q_PROPERTY(qreal opactiy READ getOpactiy WRITE setOpactiy)
 public:
-    explicit CBarrageItem(Contents *contents = NULL,
+    explicit XYBarrageItem(XYContents *contents = NULL,
                      int   showTimes = 8000,
                      const QColor &textColor = QColor("green"),
                      const QFont  &textFont = QFont("黑体", 25),
                      int barrageWidth = -1);
-    ~CBarrageItem();
+    ~XYBarrageItem();
 
     QPoint getCurrentPos();
     qreal getCurrentOpacity();
+
+    int getContentsWidth();
+    int getContentsHeight();
 
     // 使用特殊运动轨迹
     void setAnimation(const QEasingCurve &type);
@@ -75,7 +78,7 @@ private:
 
 public slots:
     void setShowTimes(int showTimes, int counts = 1);
-    void setContents(Contents *contents);
+    void setContents(XYContents *contents);
     void setTextColor(const QColor &textColor);
     void setTextFont(const QFont  &textFont);
     void setStartPos(const QPoint &startPos);
@@ -95,7 +98,6 @@ private:
     QPoint  moCurrentPos;
     int     miShowTimes;
     int     miLoopCounts;
-    QString msContents;
     QColor  moTextColor;
     QFont   moTextFont;
     int     miBarrageWidth;
@@ -116,9 +118,10 @@ private:
 
     QMovie        moBackImage;
 
-    Contents     *mopContents;
-    friend class CBarrageScreen;
-    friend class CSignalBarrageScreen;
+    XYContents     *mopContents;
+
+    friend class XYBarrageScreen;
+    friend class XYSignalBarrageScreen;
 };
 
 #endif // CBARRAGEITEM_H

@@ -2,9 +2,10 @@
 #define XYTOOLTIPS_H
 
 #include "xybordershadowwidget.h"
+#include "xymousemonitor.h"
 #include <QTimer>
 
-class XYToolTips : public XYBorderShadowWidget
+class XYToolTips : public XYBorderShadowWidget, public XYMouseMonitor
 {
     Q_OBJECT
 public:
@@ -19,6 +20,7 @@ public slots:
 protected:
     void paintEvent(QPaintEvent *event);
     void focusOutEvent(QFocusEvent *event);
+    void clicked(const QPoint &point);
 
 private:
     explicit XYToolTips(QWidget *parent = 0);

@@ -4,13 +4,13 @@
 #include <QDialog>
 #include <QMap>
 
-class DrawWidget : public QDialog
+class XYDrawWidget : public QDialog
 {
     Q_OBJECT
 
 public:
-    DrawWidget(QWidget *parent = 0);
-    ~DrawWidget();
+    XYDrawWidget(QWidget *parent = 0);
+    ~XYDrawWidget();
 
     QList<QPoint> &getDrawPoints();
     QList<qreal> &getDrawPointSpaces();

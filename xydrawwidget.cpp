@@ -1,13 +1,11 @@
-﻿#include "cdrawwidget.h"
+﻿#include "xydrawwidget.h"
 #include <QMouseEvent>
-#include <QPaintEvent>
 #include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QtMath>
-#include <QDebug>
 
-DrawWidget::DrawWidget(QWidget *parent)
+XYDrawWidget::XYDrawWidget(QWidget *parent)
     : QDialog(parent)
 {
     mbPressed = false;
@@ -21,34 +19,34 @@ DrawWidget::DrawWidget(QWidget *parent)
     connect(box, SIGNAL(clicked()), this, SLOT(clearPoints()));
 }
 
-DrawWidget::~DrawWidget()
+XYDrawWidget::~XYDrawWidget()
 {
 
 }
 
-QList<QPoint> &DrawWidget::getDrawPoints()
+QList<QPoint> &XYDrawWidget::getDrawPoints()
 {
     return mlistPointList;
 }
 
-QList<qreal> &DrawWidget::getDrawPointSpaces()
+QList<qreal> &XYDrawWidget::getDrawPointSpaces()
 {
     return mlistPointSpaceList;
 }
 
-qreal DrawWidget::getTotalLength()
+qreal XYDrawWidget::getTotalLength()
 {
     return mfTotalLength;
 }
 
-qreal DrawWidget::lengthToPoint(const QPoint &p1, const QPoint &p2)
+qreal XYDrawWidget::lengthToPoint(const QPoint &p1, const QPoint &p2)
 {
     qreal x = qFabs(p1.x() - p2.x());
     qreal y = qFabs(p1.y() - p2.y());
     return qSqrt((x*x) + (y*y));
 }
 
-void DrawWidget::clearPoints()
+void XYDrawWidget::clearPoints()
 {
     mlistPointList.clear();
     mlistPointSpaceList.clear();
@@ -58,7 +56,7 @@ void DrawWidget::clearPoints()
     update();
 }
 
-void DrawWidget::mousePressEvent(QMouseEvent *event)
+void XYDrawWidget::mousePressEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
     if (event->buttons() & Qt::LeftButton)
@@ -79,7 +77,7 @@ void DrawWidget::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void DrawWidget::mouseReleaseEvent(QMouseEvent *event)
+void XYDrawWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
     if (event->buttons() & Qt::LeftButton)
@@ -88,7 +86,7 @@ void DrawWidget::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void DrawWidget::mouseMoveEvent(QMouseEvent *event)
+void XYDrawWidget::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
     if (mbPressed)
@@ -108,7 +106,7 @@ void DrawWidget::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void DrawWidget::paintEvent(QPaintEvent *event)
+void XYDrawWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
     QPainter painter(this);
