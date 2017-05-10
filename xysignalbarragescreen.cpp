@@ -255,9 +255,10 @@ void XYSignalBarrageScreen::paintEvent(QPaintEvent *event)
     XYContents *contents = item->mopContents;
     qreal offset_X = 0;
     qreal offset_Y = 0;
-    qreal current_Y = 0;
+    qreal lineHeight = 0;
     int limit_X = 0;
     int limit_Y = 0;
+    XYContents *lineContents = contents;
     while (contents)
     {
         limit_X = item->miBarrageWidth - offset_X;
@@ -266,21 +267,21 @@ void XYSignalBarrageScreen::paintEvent(QPaintEvent *event)
         {
         case XYContents::TEXT:
         {
-            painter.drawText(QRect(offset_X,
-                                   offset_Y,
-                                   limit_X < 0 ? 0:limit_X,
-                                   limit_Y < 0 ? 0:limit_Y),
-                             contents->text);
             QFontMetrics metrics(item->moTextFont);
-            offset_X += metrics.width(contents->text) + 2.0;
-            current_Y = qMax(current_Y, metrics.height() + 2.0);
+            offset_X += metrics.width(contents->text);
+            lineHeight = qMax(lineHeight, metrics.height() * 1.0);
             break;
         }
         case XYContents::LF:
-            qDebug() << "ddd";
-            offset_Y += current_Y;
+        {
             offset_X = 0;
+            paintLineContents(painter, item, lineContents,
+                              lineHeight, offset_X, offset_Y);
+            offset_Y += lineHeight;
+            lineContents = contents->next;
+            lineHeight = 0;
             break;
+        }
         case XYContents::PIXMAP:
         {
             QPixmap pixmap;
@@ -298,18 +299,8 @@ void XYSignalBarrageScreen::paintEvent(QPaintEvent *event)
             {
                 pixmap = contents->pixmap.currentPixmap();
             }
-
-            painter.drawPixmap(QRect(offset_X,
-                                     offset_Y,
-                                     qMin(limit_X < 0 ? 0:limit_X, pixmap.width()),
-                                     qMin(limit_Y < 0 ? 0:limit_Y, pixmap.height())),
-                               pixmap,
-                               QRect(0,
-                                     0,
-                                     qMin(limit_X < 0 ? 0:limit_X, pixmap.width()),
-                                     qMin(limit_Y < 0 ? 0:limit_Y, pixmap.height())));
             offset_X += pixmap.width();
-            current_Y = qMax(current_Y, pixmap.height() + 1.0);
+            lineHeight = qMax(lineHeight, pixmap.height() * 1.0);
             break;
         }
         default:
@@ -476,5 +467,74 @@ void XYSignalBarrageScreen::clicked(const QPoint &point)
             mopMoveAnimation->setEasingCurve(QEasingCurve::Type(qrand() % 40));
             mopMoveAnimation->start();
         }
+    }
+}
+
+void XYSignalBarrageScreen::paintLineContents(QPainter &painter,
+                                              XYBarrageItem *item,
+                                              XYContents *lineContents,
+                                              qreal lineHeight,
+                                              qreal offsetX,
+                                              qreal offsetY)
+{
+    qreal offset_X = offsetX;
+    qreal offset_Y = offsetY;
+    int limit_X = 0;
+    int limit_Y = 0;
+    XYContents *contents = lineContents;
+    while (contents)
+    {
+        limit_X = item->miBarrageWidth - offset_X;
+        limit_Y = item->miBarrageHeight - offset_Y;
+        switch (contents->type)
+        {
+        case XYContents::TEXT:
+        {
+            QFontMetrics metrics(item->moTextFont);
+            painter.drawText(QRect(offset_X,
+                                   offset_Y + lineHeight - metrics.height(),
+                                   limit_X < 0 ? 0:limit_X,
+                                   limit_Y < 0 ? 0:limit_Y),
+                             contents->text);
+            offset_X += metrics.width(contents->text);
+            break;
+        }
+        case XYContents::LF:
+            return;
+        case XYContents::PIXMAP:
+        {
+            QPixmap pixmap;
+            if (!contents->pixmap.isValid())
+            {
+                QString filename = contents->pixmap.fileName();
+                pixmap.load(filename);
+            }
+            else if (contents->pixmap.state() != QMovie::Running)
+            {
+                contents->pixmap.start();
+                pixmap = contents->pixmap.currentPixmap();
+            }
+            else
+            {
+                pixmap = contents->pixmap.currentPixmap();
+            }
+
+            painter.drawPixmap(QRect(offset_X,
+                                     offset_Y + lineHeight - pixmap.height(),
+                                     qMin(limit_X < 0 ? 0:limit_X, pixmap.width()),
+                                     qMin(limit_Y < 0 ? 0:limit_Y, pixmap.height())),
+                               pixmap,
+                               QRect(0,
+                                     0,
+                                     qMin(limit_X < 0 ? 0:limit_X, pixmap.width()),
+                                     qMin(limit_Y < 0 ? 0:limit_Y, pixmap.height())));
+            offset_X += pixmap.width();
+            break;
+        }
+        default:
+            break;
+        }
+
+        contents = contents->next;
     }
 }

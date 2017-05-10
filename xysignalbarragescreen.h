@@ -38,6 +38,14 @@ protected:
     void clicked(const QPoint &point);
 
 private:
+    void paintLineContents(QPainter &painter,
+                           XYBarrageItem *item,
+                           XYContents *lineContents,
+                           qreal lineHeight,
+                           qreal offsetX,
+                           qreal offsetY);
+
+private:
     static QList<XYSignalBarrageScreen *> allSignalScreens;
     QPropertyAnimation *mopMoveAnimation;
     QPropertyAnimation *mopStepAnimation;

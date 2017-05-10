@@ -25,6 +25,13 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
+    void paintLineContents(QPainter &painter,
+                           XYBarrageItem *item,
+                           XYContents *lineContents,
+                           QPoint &currentPos,
+                           qreal lineHeight,
+                           qreal offsetX,
+                           qreal offsetY);
     explicit XYBarrageScreen(QWidget *parent = 0);
 
 private:
