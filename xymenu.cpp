@@ -58,7 +58,10 @@ QFont XYMenu::font()
 
 XYMenu::~XYMenu()
 {
-
+    if (mopLastMenu == this)
+    {
+        mopLastMenu = NULL;
+    }
 }
 
 int XYMenu::exec()
@@ -68,7 +71,7 @@ int XYMenu::exec()
         mopLastMenu->close();
     }
     setupUI();
-    QPoint pos = QCursor::pos() - QPoint(10, 10); // 为了让弹出的菜单包含鼠标
+    QPoint pos = QCursor::pos() - QPoint(10, 10);
     show();
     // show 出来以后才能获取正确的窗口大小
     int width = this->width();
