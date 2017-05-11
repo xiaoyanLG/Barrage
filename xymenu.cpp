@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <Windows.h>
 
+XYMenu *XYMenu::mopLastMenu = NULL;
 XYMenu::XYMenu(QWidget *parent)
     : XYBorderShadowWidget(parent), XYMouseMonitor()
 {
@@ -62,8 +63,12 @@ XYMenu::~XYMenu()
 
 int XYMenu::exec()
 {
+    if (mopLastMenu != NULL)
+    {
+        mopLastMenu->close();
+    }
     setupUI();
-    QPoint pos = QCursor::pos() - QPoint(12, 12); // 为了让弹出的菜单包含鼠标
+    QPoint pos = QCursor::pos() - QPoint(10, 10); // 为了让弹出的菜单包含鼠标
     show();
     // show 出来以后才能获取正确的窗口大小
     int width = this->width();
@@ -78,6 +83,7 @@ int XYMenu::exec()
         pos.setY(top->height() - height - 5);
     }
     move(pos);
+    mopLastMenu = this;
     return mopEventLoop->exec();
 }
 
@@ -142,6 +148,10 @@ bool XYMenu::close(bool closeParent)
 
     // 再关闭当前菜单
     bool ret = QWidget::close();
+    if (mopLastMenu == this)
+    {
+        mopLastMenu = NULL;
+    }
 
     // 先把焦点给父菜单
     if (mopParentMenu)

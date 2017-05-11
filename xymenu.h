@@ -43,6 +43,7 @@ private:
     void setupUI();
 
 private:
+    static XYMenu      *mopLastMenu;
     QMap<int, XYMenu *> mlistMenus;
     QList<QWidget *>    mlistWidgets;
     XYMenu        *mopParentMenu;
