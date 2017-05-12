@@ -185,11 +185,7 @@ void XYMenuStyle::mouseReleaseEvent(QMouseEvent *event)
     }
     else
     {
-        if (mopMenu->isHidden())
-        {
-            mopMenu->show();
-        }
-        mopMenu->raise();
+        mopMenu->exec(((XYMenu *)parentWidget()));
     }
     event->accept();
 }
