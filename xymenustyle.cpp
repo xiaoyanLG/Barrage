@@ -49,25 +49,27 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
 {
     int width = this->width();
     int height = this->height();
+    XYMenu *parent = (XYMenu *)this->parentWidget();
     QPainter painter(this);
     QPen pen = painter.pen();
     painter.setPen(QPen(QColor(0, 0, 0, 0)));
-    QFont font = painter.font();
 
     // 画底色
-    XYMenu *parent = (XYMenu *)this->parentWidget();
     if (parent->mopCurrentChecked == this)
     {
-        painter.setBrush(QColor("#2871d5"));
+        painter.setBrush(QColor("#85124190"));
     }
     else
     {
-        painter.setBrush(QColor("#F0F0F0"));
+        painter.setBrush(QColor("#2871d590"));
     }
     painter.drawRect(this->rect());
 
+    painter.setPen(pen);
+
     if (!mbIsMenu)
     {
+        QFontMetrics metrics(mopAction->font());
         // 画图标
         QPixmap pixmap(mopAction->icon().pixmap(25, 25));
         painter.drawPixmap(QRect(10,
@@ -79,10 +81,9 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
 
         // 画字体
         painter.setFont(mopAction->font());
-        painter.setPen(pen);
         painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
         painter.drawText(QRect(25 + 20,
-                               (height - font.pointSize()) / 2,
+                               (height - metrics.height()) / 2,
                                width,
                                height),
                          mopAction->text());
@@ -113,6 +114,7 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
     }
     else
     {
+        QFontMetrics metrics(mopMenu->font());
         // 画图标
         QPixmap pixmap(mopMenu->icon().pixmap(25, 25));
         painter.drawPixmap(QRect(10,
@@ -124,9 +126,8 @@ void XYMenuStyle::paintEvent(QPaintEvent *event)
 
         // 画字体
         painter.setFont(mopMenu->font());
-        painter.setPen(pen);
         painter.drawText(QRect(25 + 20,
-                               (height - font.pointSize()) / 2,
+                               (height - metrics.height()) / 2,
                                width,
                                height),
                          mopMenu->title());

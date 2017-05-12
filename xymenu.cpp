@@ -7,6 +7,7 @@
 #include <QDesktopWidget>
 #include <QVBoxLayout>
 #include <Windows.h>
+#include <QPainter>
 
 XYMenu *XYMenu::mopLastMenu = NULL;
 XYMenu::XYMenu(QWidget *parent)
@@ -15,6 +16,8 @@ XYMenu::XYMenu(QWidget *parent)
     this->setWindowFlags(Qt::FramelessWindowHint
                          | Qt::WindowStaysOnTopHint
                          | Qt::WindowType_Mask);
+
+    moBackImage = QPixmap(":/sourceImage/backImage");
     mopEventLoop = new QEventLoop(this);
     mopMainLayout = new QVBoxLayout(this);
     miActionMaxWidth = 0;
@@ -188,6 +191,11 @@ void XYMenu::setFont(const QFont &font)
     moFont = font;
 }
 
+void XYMenu::setBackImage(const QPixmap &image)
+{
+    moBackImage = image;
+}
+
 void XYMenu::addMenu(XYMenu *menu)
 {
     if (menu != NULL)
@@ -196,6 +204,15 @@ void XYMenu::addMenu(XYMenu *menu)
         mlistWidgets += menu->mlistWidgets;
         mlistMenus.insert(actions().size(), menu);
     }
+}
+
+void XYMenu::paintEvent(QPaintEvent *event)
+{
+    XYBorderShadowWidget::paintEvent(event);
+    QPainter painter(this);
+
+    painter.drawPixmap(10, 10, width() - 20, height() - 20, moBackImage);
+
 }
 
 void XYMenu::focusOutEvent(QFocusEvent *event)

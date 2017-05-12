@@ -5,6 +5,7 @@
 #include "xymousemonitor.h"
 #include <QIcon>
 #include <QMap>
+#include <QPixmap>
 
 class XYMenuStyle;
 class QEventLoop;
@@ -31,9 +32,11 @@ public slots:
     void setTitle(const QString &title);
     void setIcon(const QIcon &icon);
     void setFont(const QFont &font);
+    void setBackImage(const QPixmap &image);
     void addMenu(XYMenu *menu);
 
 protected:
+    void paintEvent(QPaintEvent *event);
     void focusOutEvent(QFocusEvent *event);
     void leaveEvent(QEvent *event);
     void clicked(const QPoint &point);
@@ -54,6 +57,7 @@ private:
     QString        msTitle;
     QIcon          moIcon;
     QFont          moFont;
+    QPixmap        moBackImage;
     int            miActionMaxWidth;
 
     friend class   XYMenuStyle;

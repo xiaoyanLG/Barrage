@@ -303,5 +303,6 @@
         <file>sourceImage/checked.ico</file>
         <file>sourceImage/unchecked.ico</file>
         <file>sourceImage/menu2.ico</file>
+        <file>sourceImage/backImage.jpg</file>
     </qresource>
 </RCC>
