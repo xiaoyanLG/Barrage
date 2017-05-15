@@ -6,6 +6,7 @@
 #include <QIcon>
 #include <QMap>
 #include <QPixmap>
+#include <QAction>
 
 class XYMenuStyle;
 class QEventLoop;

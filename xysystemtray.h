@@ -17,6 +17,10 @@ private slots:
     void showParent();
     void showContext();
     void SystemTrayActivated(QSystemTrayIcon::ActivationReason reason);//处理点击托盘操作
+
+private:
+    //截图全局热键
+    int      miShortcutKey;
 };
 
 #endif // SYSTEMTRAY_H

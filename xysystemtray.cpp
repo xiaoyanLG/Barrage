@@ -4,8 +4,8 @@
 #include "mainwindow.h"
 #include "xymenu.h"
 #include "xytooltips.h"
+#include "xyfullscreenshots.h"
 #include <QTime>
-#include <QAction>
 #include <QApplication>
 
 void test()
@@ -37,7 +37,10 @@ XYSystemTray::XYSystemTray(QWidget *parent)
 
 XYSystemTray::~XYSystemTray()
 {
-
+    if(!UnregisterHotKey(HWND(XYFullScreenShots::getInstance()->winId()), miShortcutKey))
+    {
+        qDebug("UnregisterHotKey failed!");
+    }
 }
 void XYSystemTray::InitTyay()
 {
@@ -48,6 +51,14 @@ void XYSystemTray::InitTyay()
 
     this->setIcon(QIcon(":/send.ico"));
     this->setToolTip(QStringLiteral("给你惊喜！！！"));
+
+    // 注册全局热键
+    miShortcutKey =GlobalAddAtom(L"ScreenShotsGlobalHotKey") - 0xC000;
+
+    if(!RegisterHotKey(HWND(XYFullScreenShots::getInstance()->winId()), miShortcutKey, MOD_CONTROL|MOD_ALT, 0x41))
+    {
+        qDebug("RegisterHotKey failed!");
+    }
 }
 
 void XYSystemTray::hideBarrageScreen()
