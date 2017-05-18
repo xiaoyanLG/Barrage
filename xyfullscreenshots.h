@@ -15,6 +15,7 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
     //处理全局热键
     bool nativeEvent(const QByteArray &eventType, void *message, long *result);
 
@@ -24,6 +25,7 @@ private:
 
 private slots:
     void saveChoisePixmap();
+    void resetChoiseRectSize();
 
 private:
     static XYFullScreenShots *mopInstance;

@@ -6,6 +6,7 @@
 #include <QDesktopWidget>
 #include <QScreen>
 #include <QFileDialog>
+#include <QLineEdit>
 
 XYFullScreenShots *XYFullScreenShots::mopInstance = NULL;
 XYFullScreenShots::XYFullScreenShots(QWidget *parent)
@@ -65,6 +66,8 @@ void XYFullScreenShots::paintEvent(QPaintEvent *event)
 
 void XYFullScreenShots::mousePressEvent(QMouseEvent *event)
 {
+    setFocus();
+
     if (event->button() == Qt::LeftButton)
     {
         mbLeftPress = true;
@@ -179,6 +182,30 @@ void XYFullScreenShots::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+void XYFullScreenShots::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+    case Qt::Key_Up:
+        moDrawPoint.setY(moDrawPoint.y() - 1);
+        break;
+    case Qt::Key_Down:
+        moDrawPoint.setY(moDrawPoint.y() + 1);
+        break;
+    case Qt::Key_Left:
+        moDrawPoint.setX(moDrawPoint.x() - 1);
+        break;
+    case Qt::Key_Right:
+        moDrawPoint.setX(moDrawPoint.x() + 1);
+        break;
+    default:
+        return;
+    }
+    moCurrentRect = QRect(moDrawPoint, moCurrentRect.size());
+    moChoiseRectPixmap = moBackPixmap.copy(QRect(moDrawPoint, moChoiseRectPixmap.size()));
+    update();
+}
+
 bool XYFullScreenShots::nativeEvent(const QByteArray &eventType, void *message, long *result)
 {
     if(eventType == "windows_generic_MSG")
@@ -205,8 +232,13 @@ bool XYFullScreenShots::nativeEvent(const QByteArray &eventType, void *message, 
 void XYFullScreenShots::ShowMenu()
 {
     XYMenu menu;
-    QAction *save = new QAction("Save", &menu);
+    QAction *save = new QAction(tr("Save"), &menu);
     connect(save, SIGNAL(triggered()), this, SLOT(saveChoisePixmap()));
+
+    QAction *setRect = new QAction(tr("Set Rect"), &menu);
+    connect(setRect, SIGNAL(triggered()), this, SLOT(resetChoiseRectSize()));
+
+    menu.addAction(setRect);
     menu.addAction(save);
 
     menu.exec();
@@ -238,5 +270,45 @@ void XYFullScreenShots::saveChoisePixmap()
 
     moChoiseRectPixmap.load("");
     close();
+}
+
+void XYFullScreenShots::resetChoiseRectSize()
+{
+    int h = QFontMetrics(qApp->font()).height();
+    QEventLoop loop;
+    QLineEdit line(this);
+    line.setFocus();
+    line.setText(QString("(   %1   ,   %2   )").arg(moChoiseRectPixmap.width()).arg(moChoiseRectPixmap.height()));
+    connect(&line, SIGNAL(editingFinished()), &loop, SLOT(quit()));
+    line.move(moDrawPoint.x(), moDrawPoint.y() - h - 7);
+    line.show();
+    loop.exec();
+
+    QString width;
+    QString height;
+    bool bw = true;
+    bool st = false;
+    for (int i = 0; i < line.text().size(); ++i)
+    {
+        if (line.text().at(i).isNumber())
+        {
+            st = true;
+            if (bw)
+            {
+                width.append(line.text().at(i));
+            }
+            else
+            {
+                height.append(line.text().at(i));
+            }
+        }
+        else if (st)
+        {
+            bw = false;
+        }
+    }
+    moChoiseRectPixmap = moBackPixmap.copy(QRect(moDrawPoint, QSize(width.toInt(), height.toInt())));
+    moCurrentRect = QRect(moDrawPoint, moChoiseRectPixmap.size());
+    update();
 }
 
