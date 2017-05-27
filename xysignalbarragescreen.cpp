@@ -11,7 +11,7 @@
 #include <QDebug>
 QList<XYSignalBarrageScreen *> XYSignalBarrageScreen::allSignalScreens;
 XYSignalBarrageScreen::XYSignalBarrageScreen(XYBarrageItem *item, QWidget *parent)
-    : QWidget(parent), XYMouseMonitor()
+    : XYMovableWidget(parent), XYMouseMonitor()
 {
     this->setWindowFlags(Qt::FramelessWindowHint
                          | Qt::WindowStaysOnTopHint
@@ -19,7 +19,6 @@ XYSignalBarrageScreen::XYSignalBarrageScreen(XYBarrageItem *item, QWidget *paren
     this->setAttribute(Qt::WA_TranslucentBackground);
 
     allSignalScreens.append(this);
-    mbLeftMousePressed = false;
     mbFixed = false;
     mbAutoMove = false;
     mbForceTop = false;
@@ -343,30 +342,8 @@ void XYSignalBarrageScreen::mousePressEvent(QMouseEvent *event)
         {
             mopStepAnimation->stop();
         }
-        mbLeftMousePressed = true;
-        moLastPos = event->globalPos();
     }
-}
-
-void XYSignalBarrageScreen::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton)
-    {
-        mbLeftMousePressed = false;
-        moLastPos = event->globalPos();
-    }
-}
-
-void XYSignalBarrageScreen::mouseMoveEvent(QMouseEvent *event)
-{
-    if (mbLeftMousePressed)
-    {
-        QPoint lastpos = pos();
-        lastpos.setX( lastpos.x() + event->globalX() - moLastPos.x());
-        lastpos.setY( lastpos.y() + event->globalY() - moLastPos.y());
-        move(lastpos);
-        moLastPos = event->globalPos();
-    }
+    XYMovableWidget::mousePressEvent(event);
 }
 
 void XYSignalBarrageScreen::contextMenuEvent(QContextMenuEvent *event)

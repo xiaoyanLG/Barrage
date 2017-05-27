@@ -4,9 +4,9 @@
 #include "xymousemonitor.h"
 #include "xybarrageitem.h"
 #include "xymovepath.h"
-#include <QWidget>
+#include "xymovablewidget.h"
 
-class XYSignalBarrageScreen : public QWidget, public XYMouseMonitor
+class XYSignalBarrageScreen : public XYMovableWidget, public XYMouseMonitor
 {
     Q_OBJECT
     Q_PROPERTY(qreal step READ step WRITE setStep)
@@ -32,8 +32,6 @@ protected:
     void paintEvent(QPaintEvent *event);
     void timerEvent(QTimerEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
     void clicked(const QPoint &point);
 
@@ -57,11 +55,9 @@ private:
     int           miRefreshTimer;
     int           miMoveAutoTimer;
     bool          mbAutoMove;
-    bool          mbLeftMousePressed;
     bool          mbForceTop;
     bool          mbMouseThrough;
     bool          mbRandomCall;
-    QPoint        moLastPos;
     long          miWindowLong;
 
     QMap<int, bool>  mmapPath;

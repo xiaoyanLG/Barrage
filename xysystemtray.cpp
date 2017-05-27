@@ -5,6 +5,7 @@
 #include "xymenu.h"
 #include "xytooltips.h"
 #include "xyfullscreenshots.h"
+#include "xytextboard.h"
 #include <QTime>
 #include <QApplication>
 
@@ -71,6 +72,12 @@ void XYSystemTray::closeAllAnimation()
     XYSignalBarrageScreen::deleteAllAnimations();
 }
 
+void XYSystemTray::addTextBoard()
+{
+    XYTextBoard *board = new XYTextBoard;
+    board->show();
+}
+
 void XYSystemTray::showParent()
 {
     QWidget *parent = (QWidget *)this->parent();
@@ -90,6 +97,10 @@ void XYSystemTray::showContext()
         QAction *screenShots = new QAction(QStringLiteral("截屏"), myMenu);
         screenShots->setShortcut(QKeySequence("Ctrl+Alt+A"));
         connect(screenShots, SIGNAL(triggered()), XYFullScreenShots::getInstance(), SLOT(startScreenShots()));
+
+        QAction *addTextBoard = new QAction(QStringLiteral("添加文本窗口"), myMenu);
+        connect(addTextBoard, SIGNAL(triggered()), this, SLOT(addTextBoard()));
+
         QAction *closeBarrageScreen = new QAction(QStringLiteral("关闭弹幕窗口"), myMenu);
         closeBarrageScreen->setCheckable(true);
         closeBarrageScreen->setChecked(XYBarrageScreen::getScreen()->isHidden());
@@ -108,6 +119,7 @@ void XYSystemTray::showContext()
         connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
         myMenu->addAction(screenShots);
+        myMenu->addAction(addTextBoard);
         myMenu->addAction(top);
         myMenu->addAction(closeBarrageScreen);
         myMenu->addAction(closeAllAnimations);

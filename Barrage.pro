@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     xyemoticonwidget.cpp \
     xyexpressionlabel.cpp \
     xysystemtray.cpp \
-    xyfullscreenshots.cpp
+    xyfullscreenshots.cpp \
+    xytextboard.cpp \
+    xymovablewidget.cpp
 
 HEADERS  += mainwindow.h \
     qtsingle/qtlocalpeer.h \
@@ -54,7 +56,9 @@ HEADERS  += mainwindow.h \
     xyemoticonwidget.h \
     xyexpressionlabel.h \
     xysystemtray.h \
-    xyfullscreenshots.h
+    xyfullscreenshots.h \
+    xytextboard.h \
+    xymovablewidget.h
 
 FORMS += \
     mainwindow.ui
