@@ -277,15 +277,14 @@ void XYFullScreenShots::ShowMenu()
 void XYFullScreenShots::startScreenShots()
 {
     moBackPixmap = qApp->screens().at(qApp->desktop()->screenNumber())->grabWindow(qApp->desktop()->winId());
-    update();
     if (isHidden())
     {
         show();
     }
-    else
-    {
-        raise();
-    }
+    moChoiseRectPixmap.load("");
+    moCurrentRect = QRect();
+    update();
+    raise();
 }
 
 void XYFullScreenShots::endScreenShots()
