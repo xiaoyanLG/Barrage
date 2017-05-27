@@ -31,13 +31,9 @@ bool XYMenuStyle::event(QEvent *event)
 {
     if (event->type() == QEvent::ToolTip)
     {
-        if (mbIsMenu)
+        if (!mbIsMenu && mopAction)
         {
-            XYToolTips::showToolTips(mopMenu->title());
-        }
-        else
-        {
-            XYToolTips::showToolTips(mopAction->text());
+            XYToolTips::showToolTips(mopAction->shortcut().toString());
         }
         return true;
     }

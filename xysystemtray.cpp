@@ -87,6 +87,9 @@ void XYSystemTray::showContext()
     if (myMenu == NULL)
     {
         myMenu = new XYMenu;
+        QAction *screenShots = new QAction(QStringLiteral("截屏"), myMenu);
+        screenShots->setShortcut(QKeySequence("Ctrl+Alt+A"));
+        connect(screenShots, SIGNAL(triggered()), XYFullScreenShots::getInstance(), SLOT(startScreenShots()));
         QAction *closeBarrageScreen = new QAction(QStringLiteral("关闭弹幕窗口"), myMenu);
         closeBarrageScreen->setCheckable(true);
         closeBarrageScreen->setChecked(XYBarrageScreen::getScreen()->isHidden());
@@ -104,6 +107,7 @@ void XYSystemTray::showContext()
 
         connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
+        myMenu->addAction(screenShots);
         myMenu->addAction(top);
         myMenu->addAction(closeBarrageScreen);
         myMenu->addAction(closeAllAnimations);

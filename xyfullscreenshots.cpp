@@ -7,6 +7,8 @@
 #include <QScreen>
 #include <QFileDialog>
 #include <QLineEdit>
+#include <QDateTime>
+#include <QClipboard>
 
 XYFullScreenShots *XYFullScreenShots::mopInstance = NULL;
 XYFullScreenShots::XYFullScreenShots(QWidget *parent)
@@ -89,7 +91,7 @@ void XYFullScreenShots::mouseReleaseEvent(QMouseEvent *event)
     {
         if (moChoiseRectPixmap.isNull())
         {
-            close();
+            endScreenShots();
         }
         else
         {
@@ -198,6 +200,28 @@ void XYFullScreenShots::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Right:
         moDrawPoint.setX(moDrawPoint.x() + 1);
         break;
+    case Qt::Key_S:
+        if (event->modifiers() == Qt::ControlModifier)
+        {
+            if (!moChoiseRectPixmap.isNull())
+            {
+                saveChoisePixmap();
+            }
+            return;
+        }
+    case Qt::Key_R:
+        if (event->modifiers() == Qt::ControlModifier)
+        {
+            if (moDrawPoint.isNull())
+            {
+                moDrawPoint = QPoint(width()/2, height()/2);
+            }
+            resetChoiseRectSize();
+            return;
+        }
+    case Qt::Key_C:
+        saveToClipboard();
+        return;
     default:
         return;
     }
@@ -219,8 +243,7 @@ bool XYFullScreenShots::nativeEvent(const QByteArray &eventType, void *message, 
             // This is HotKey!;
             if(fuModifiers == MOD_SHIFT|MOD_ALT && uVirtKey == 0x41)
             {
-                moBackPixmap = qApp->screens().at(qApp->desktop()->screenNumber())->grabWindow(qApp->desktop()->winId());
-                show();
+                startScreenShots();
             }
             return true;
 
@@ -233,24 +256,58 @@ void XYFullScreenShots::ShowMenu()
 {
     XYMenu menu;
     QAction *save = new QAction(tr("Save"), &menu);
+    save->setShortcut(QKeySequence("Ctrl+S"));
     connect(save, SIGNAL(triggered()), this, SLOT(saveChoisePixmap()));
 
+    QAction *saveToClipBoard = new QAction(tr("Save To ClipBoard"), &menu);
+    saveToClipBoard->setShortcut(QKeySequence("Ctrl+C"));
+    connect(saveToClipBoard, SIGNAL(triggered()), this, SLOT(saveToClipboard()));
+
     QAction *setRect = new QAction(tr("Set Rect"), &menu);
+    setRect->setShortcut(QKeySequence("Ctrl+R"));
     connect(setRect, SIGNAL(triggered()), this, SLOT(resetChoiseRectSize()));
 
     menu.addAction(setRect);
+    menu.addAction(saveToClipBoard);
     menu.addAction(save);
 
     menu.exec();
 }
 
+void XYFullScreenShots::startScreenShots()
+{
+    moBackPixmap = qApp->screens().at(qApp->desktop()->screenNumber())->grabWindow(qApp->desktop()->winId());
+    update();
+    if (isHidden())
+    {
+        show();
+    }
+    else
+    {
+        raise();
+    }
+}
+
+void XYFullScreenShots::endScreenShots()
+{
+    moChoiseRectPixmap.load("");
+    moCurrentRect = QRect();
+    close();
+}
+
 void XYFullScreenShots::saveChoisePixmap()
 {
+    static QString lastPath;
     QString imageFile = QFileDialog::getSaveFileName(this, tr("Save File"),
-                                                     QString(),
+                                                     lastPath + "/" + QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + ".png",
                                                      tr("PNG (*.png);;JPG (*.jpg);;BMP (*.bmp)"));
 
 
+    QString curpath = QFileInfo(imageFile).filePath();
+    if (!curpath.isEmpty())
+    {
+        lastPath = curpath;
+    }
     if (imageFile.endsWith(".png"))
     {
         moChoiseRectPixmap.save(imageFile, "PNG");
@@ -268,8 +325,7 @@ void XYFullScreenShots::saveChoisePixmap()
         moChoiseRectPixmap.save(imageFile);
     }
 
-    moChoiseRectPixmap.load("");
-    close();
+    endScreenShots();
 }
 
 void XYFullScreenShots::resetChoiseRectSize()
@@ -307,8 +363,23 @@ void XYFullScreenShots::resetChoiseRectSize()
             bw = false;
         }
     }
+    if (width == "0" || height == "0")
+    {
+        return;
+    }
     moChoiseRectPixmap = moBackPixmap.copy(QRect(moDrawPoint, QSize(width.toInt(), height.toInt())));
     moCurrentRect = QRect(moDrawPoint, moChoiseRectPixmap.size());
     update();
+}
+
+void XYFullScreenShots::saveToClipboard()
+{
+    if (!moChoiseRectPixmap.isNull())
+    {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setPixmap(moChoiseRectPixmap);
+        endScreenShots();
+        return;
+    }
 }
 

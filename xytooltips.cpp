@@ -44,6 +44,10 @@ void XYToolTips::showToolTips(const QString &tooltips)
 
 void XYToolTips::showToolTips(const QString &tooltips, const QPoint &pos)
 {
+    if (tooltips.trimmed().isEmpty())
+    {
+        return;
+    }
     XYToolTips *toolwd = getInstance();
     if (!toolwd->isHidden())
     {

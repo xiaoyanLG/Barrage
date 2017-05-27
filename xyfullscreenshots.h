@@ -24,8 +24,11 @@ private:
     void ShowMenu();
 
 private slots:
+    void startScreenShots();
+    void endScreenShots();
     void saveChoisePixmap();
     void resetChoiseRectSize();
+    void saveToClipboard();
 
 private:
     static XYFullScreenShots *mopInstance;
