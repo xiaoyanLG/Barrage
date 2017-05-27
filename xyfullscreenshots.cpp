@@ -378,8 +378,7 @@ void XYFullScreenShots::saveToClipboard()
     {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setPixmap(moChoiseRectPixmap);
-        endScreenShots();
-        return;
     }
+    endScreenShots();
 }
 
