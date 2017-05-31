@@ -320,6 +320,7 @@ void XYBarrageItem::setContents(XYContents *contents)
 {
     deleteContents();
     mopContents = contents;
+    setEndPos(QPoint());
 }
 
 void XYBarrageItem::setTextColor(const QColor &textColor)
