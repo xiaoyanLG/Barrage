@@ -352,6 +352,7 @@ void MainWindow::start()
 void MainWindow::stop()
 {
     tcpSocket->stop();
+    ui->roomID->clear();
 }
 
 void MainWindow::timerEvent(QTimerEvent *event)
