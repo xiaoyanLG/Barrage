@@ -5,6 +5,11 @@
 #include <QCloseEvent>
 #include <QMap>
 #include <QMovie>
+
+// 斗鱼弹幕
+#include "douyutcpsocket.h"
+#include "networkaccess.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -32,6 +37,13 @@ public slots:
     void timerShot(int number);
     void addAnimation();
 
+    // 斗鱼弹幕获取接口
+public slots:
+    void htmlContent(const QString html);
+    void showChatMessage(QMap<QString, QString>);
+    void start();
+    void stop();
+
 protected:
     void timerEvent(QTimerEvent *event);
 
@@ -45,6 +57,10 @@ private:
     qreal                mfTotalLength;
     QList<QPoint>        mlistDrawPoints;
     QList<qreal>         mlistPointSpaces;
+
+    // 斗鱼弹幕
+    NetworkAccess *network_access;
+    DouyuTcpSocket *tcpSocket;
 };
 
 #endif // MAINWINDOW_H

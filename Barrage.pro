@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Barrage
 TEMPLATE = app
 
-INCLUDEPATH += qtsingle/
+INCLUDEPATH += qtsingle/ DouYuDanMu/
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -36,7 +36,11 @@ SOURCES += main.cpp\
     xysystemtray.cpp \
     xyfullscreenshots.cpp \
     xytextboard.cpp \
-    xymovablewidget.cpp
+    xymovablewidget.cpp \
+    DouYuDanMu/douyutcpsocket.cpp \
+    DouYuDanMu/jsonparse.cpp \
+    DouYuDanMu/networkaccess.cpp \
+    DouYuDanMu/stringgenerator.cpp
 
 HEADERS  += mainwindow.h \
     qtsingle/qtlocalpeer.h \
@@ -58,7 +62,12 @@ HEADERS  += mainwindow.h \
     xysystemtray.h \
     xyfullscreenshots.h \
     xytextboard.h \
-    xymovablewidget.h
+    xymovablewidget.h \
+    DouYuDanMu/danmuconfig.h \
+    DouYuDanMu/douyutcpsocket.h \
+    DouYuDanMu/jsonparse.h \
+    DouYuDanMu/networkaccess.h \
+    DouYuDanMu/stringgenerator.h
 
 FORMS += \
     mainwindow.ui

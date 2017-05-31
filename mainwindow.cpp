@@ -11,10 +11,16 @@
 #include <QTextFormat>
 #include <QFileInfo>
 #include <QTimer>
+#include <QPlainTextEdit>
 #include <QTextDocumentWriter>
 #include "xyemoticonwidget.h"
 #include "xysignalbarragescreen.h"
 #include "xytooltips.h"
+
+// 斗鱼弹幕
+#include "danmuconfig.h"
+#include "jsonparse.h"
+#include "stringgenerator.h"
 
 MainWindow *MainWindow::mopInstance = NULL;
 MainWindow *MainWindow::instance()
@@ -40,6 +46,15 @@ MainWindow::MainWindow(QWidget *parent) :
     insertImage(":/Gif/60");
     resize(1000, 700);
     mopInstance = this;
+
+    // 斗鱼弹幕
+    network_access = new NetworkAccess();
+    tcpSocket = new DouyuTcpSocket(this);
+    connect(ui->monitorBtn, SIGNAL(clicked()), this, SLOT(start()));
+    connect(ui->stopBtn, SIGNAL(clicked()), this, SLOT(stop()));
+    connect(network_access, SIGNAL(pageLoadFinished(QString)),
+            this, SLOT(htmlContent(QString)));
+    connect(tcpSocket, SIGNAL(chatMessage(QMap<QString,QString>)), this, SLOT(showChatMessage(QMap<QString,QString>)));
 }
 
 QFont MainWindow::getFont()
@@ -257,6 +272,86 @@ void MainWindow::addAnimation()
     XYSignalBarrageScreen *signalScreen = new XYSignalBarrageScreen;
     signalScreen->setItem(getItem());
     signalScreen->show();
+}
+
+void MainWindow::htmlContent(const QString html)
+{
+    //正则数据提取JSON
+    QString pattern = _Douyu_Room_Pattern;
+    QRegExp regExp(pattern);
+    regExp.setMinimal(true);
+    QString json;
+    int pos = 0;
+    while((pos = regExp.indexIn(html,pos)) != -1)
+    {
+        json = regExp.capturedTexts().at(1);
+        pos += regExp.matchedLength();
+    }
+    JSONParse parse;
+    if(parse.init(json))
+    {
+        QString roomid = parse.getJsonValue(_Douyu_RoomId);
+        tcpSocket->connectDanmuServer(roomid);
+    }
+}
+
+
+void MainWindow::showChatMessage(QMap<QString,QString> messageMap)
+{
+    QString str = StringGenerator::getString(messageMap, true, ui->checkBox_name->isChecked(), ui->checkBox_grade->isChecked());
+
+    if ( messageMap["type"] == "connectstate")
+    {//连接状态
+        return;
+    }
+    else if( messageMap["type"] == "chatmsg")
+    {//弹幕消息
+
+    }
+    else if( messageMap["type"] == "dgb" || messageMap["type"] == "bc_buy_deserve")
+    {//打赏消息
+        if (!ui->checkBox_gift->isChecked())
+        {
+            return;
+        }
+    }
+
+    XYBarrageItem *item = getItem(0);
+    XYContents *contentsHeader =new XYContents(str.trimmed());
+    XYContents *next = new XYContents;
+    next->type = XYContents::LF;
+    next->text = "\n";
+    contentsHeader->next = next;
+    item->setContents(contentsHeader);
+    XYBarrageScreen::getScreen()->setMaxBarrageNumber(ui->lineEdit_max->text().toInt());
+    XYBarrageScreen::getScreen()->addItem(item);
+}
+
+void MainWindow::start()
+{
+    QString roomid = ui->roomID->text();
+    QRegExp rx("[0-9a-zA-Z]+");
+    rx.setMinimal(false);
+    if(rx.exactMatch(roomid))
+    {
+        bool ok = false;
+        roomid.toInt(&ok);
+        if(!ok)
+        {
+            QString url_str = QString("http://www.douyu.com/%1").arg(roomid);
+            QUrl url = QUrl(QString(url_str));
+            network_access->loadingPage(url);
+        }
+        else
+        {
+            tcpSocket->connectDanmuServer(roomid);
+        }
+    }
+}
+
+void MainWindow::stop()
+{
+    tcpSocket->stop();
 }
 
 void MainWindow::timerEvent(QTimerEvent *event)

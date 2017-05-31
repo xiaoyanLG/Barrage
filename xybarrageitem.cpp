@@ -29,13 +29,7 @@ XYBarrageItem::XYBarrageItem(XYContents *contents,
 
 XYBarrageItem::~XYBarrageItem()
 {
-    XYContents *contents = mopContents;
-    while (contents)
-    {
-        XYContents *next = contents->next;
-        delete contents;
-        contents = next;
-    }
+    deleteContents();
 }
 
 QPoint XYBarrageItem::getCurrentPos()
@@ -204,7 +198,7 @@ void XYBarrageItem::setAnimation(const QEasingCurve &type)
     mopOpactiyAnimation->setStartValue(0);
     if (miShowTimes > 1000)
     {
-        mopOpactiyAnimation->setKeyValueAt(500.0/miShowTimes, 1);
+        mopOpactiyAnimation->setKeyValueAt(300.0/miShowTimes, 1);
     }
     if (miShowTimes <= 1000)
     {
@@ -212,7 +206,7 @@ void XYBarrageItem::setAnimation(const QEasingCurve &type)
     }
     if (miShowTimes > 1000)
     {
-        mopOpactiyAnimation->setKeyValueAt(1.0- 500.0/miShowTimes, 1);
+        mopOpactiyAnimation->setKeyValueAt(1.0- 300.0/miShowTimes, 1);
     }
     mopOpactiyAnimation->setEndValue(0);
 }
@@ -281,6 +275,18 @@ qreal XYBarrageItem::lengthToPoint(const QPoint &p1, const QPoint &p2)
     return qSqrt((x*x) + (y*y));
 }
 
+void XYBarrageItem::deleteContents()
+{
+    XYContents *contents = mopContents;
+    while (contents)
+    {
+        XYContents *next = contents->next;
+        delete contents;
+        contents = next;
+    }
+    mopContents = NULL;
+}
+
 void XYBarrageItem::setShowTimes(int showTimes, int counts)
 {
     miShowTimes = showTimes;
@@ -312,6 +318,7 @@ void XYBarrageItem::setShowTimes(int showTimes, int counts)
 
 void XYBarrageItem::setContents(XYContents *contents)
 {
+    deleteContents();
     mopContents = contents;
 }
 
