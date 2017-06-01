@@ -43,10 +43,13 @@ bool XYBarrageScreen::forceTop()
 
 void XYBarrageScreen::addItem(XYBarrageItem *item)
 {
-    int insert_pos = qMin(mlistBarrageItems.size(), miMaxBarrageNumber);
-    mlistBarrageItems.insert(insert_pos, item);
+    if (mlistBarrageItems.size() > 1000)
+    {
+        delete item;
+        return;
+    }
+    mlistBarrageItems.append(item);
     miRefreshTimer = startTimer(15);
-    raise();
 }
 
 void XYBarrageScreen::delItem(XYBarrageItem *item)
@@ -84,6 +87,7 @@ void XYBarrageScreen::paintEvent(QPaintEvent *event)
     for (int i = 0; i < mlistBarrageItems.size() && i < miMaxBarrageNumber; ++i)
     {
         XYBarrageItem *item = mlistBarrageItems.at(i);
+        QFontMetrics metrics(item->moTextFont);
         QPoint currentPos = item->getCurrentPos();
         painter.setPen(item->moTextColor);
         painter.setFont(item->moTextFont);
@@ -122,7 +126,6 @@ void XYBarrageScreen::paintEvent(QPaintEvent *event)
             {
             case XYContents::TEXT:
             {
-                QFontMetrics metrics(item->moTextFont);
                 offset_X += metrics.width(contents->text);
                 lineHeight = qMax(lineHeight, metrics.height() * 1.0);
                 break;
