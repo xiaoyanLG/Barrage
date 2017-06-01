@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     }
     a.setQuitOnLastWindowClosed(false);
     MainWindow w;
+    w.setWindowTitle(QObject::tr("Barrage"));
     w.show();
     a.setActivationWindow(&w);
     return a.exec();

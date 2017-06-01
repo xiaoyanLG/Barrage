@@ -67,7 +67,8 @@ HEADERS  += mainwindow.h \
     DouYuDanMu/douyutcpsocket.h \
     DouYuDanMu/jsonparse.h \
     DouYuDanMu/networkaccess.h \
-    DouYuDanMu/stringgenerator.h
+    DouYuDanMu/stringgenerator.h \
+    version.h
 
 FORMS += \
     mainwindow.ui
