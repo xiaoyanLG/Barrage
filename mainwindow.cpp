@@ -298,10 +298,15 @@ void MainWindow::htmlContent(const QString html)
 
 void MainWindow::showChatMessage(QMap<QString,QString> messageMap)
 {
-    QString str = StringGenerator::getString(messageMap, true, ui->checkBox_name->isChecked(), ui->checkBox_grade->isChecked());
+//    qDebug() << __FUNCTION__;
+    QString str = StringGenerator::getString(messageMap,
+                                             true,
+                                             ui->checkBox_name->isChecked(),
+                                             ui->checkBox_grade->isChecked());
 
     if ( messageMap["type"] == "connectstate")
     {//连接状态
+        ui->connectState->setText(messageMap["state"]);
         return;
     }
     else if( messageMap["type"] == "chatmsg")

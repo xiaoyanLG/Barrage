@@ -41,7 +41,7 @@ private:
      * 向服务器写消息
      * @param content
      */
-    void messageWrite(QString &content);
+    void messageWrite(const QString &content);
     QString danmu_rid; //roomid
     QString request_state;
 private slots:

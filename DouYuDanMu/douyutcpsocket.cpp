@@ -32,6 +32,7 @@ DouyuTcpSocket::~DouyuTcpSocket()
 
 void DouyuTcpSocket::loginAuth()
 {
+//    qDebug() << __FUNCTION__;
     QStringList key_list = (QStringList()
                             <<"type"
                             <<"username"
@@ -89,25 +90,24 @@ void DouyuTcpSocket::readDanmuMessage()
                                   <<"joingroup" //登录请求
                                   <<danmu_rid //房间号
                                   <<_Douyu_Room_gid //分组
-                    );
+                                  );
 
-        QString content = STTSerialization(key_list,value_list);
+        QString content = STTSerialization(key_list, value_list);
         this->messageWrite(content);
         request_state = "receiveDanmu";
         timer->start(_Douyu_DanmuServer_Intervals);
     }
 }
 
-void DouyuTcpSocket::messageWrite(QString &content)
+void DouyuTcpSocket::messageWrite(const QString &content)
 {
-    const char *content_ptr = content.toLatin1().data();
     QDataStream sendOut(&outBlock,QIODevice::WriteOnly);
     qint32 length = 4 + 4 + content.length() + 1;// 2个uint32字段长度+内容长度+'\0'
-    sendOut<<qint32(hexReverse_qint32(length))<<qint32(hexReverse_qint32(length))<<qint32(_Douyu_CTS_Num);
-    outBlock.append(content_ptr);
+    sendOut << qint32(hexReverse_qint32(length)) << qint32(hexReverse_qint32(length)) << qint32(_Douyu_CTS_Num);
+    outBlock.append(content.toLatin1());
     outBlock.append('\0');
     tcpDanmuSoc.write(outBlock);
-    outBlock.resize(0);
+    outBlock.clear();
 }
 
 void DouyuTcpSocket::connectDanmuServer(QString &roomid)
@@ -132,12 +132,13 @@ void DouyuTcpSocket::displayError(QAbstractSocket::SocketError error)
 {
 
     QString error_str = tcpDanmuSoc.errorString();
-    qDebug()<<error_str;
+//    qDebug() << error_str;
     tcpDanmuSoc.close();
 }
 
 void DouyuTcpSocket::keepAlive()
 {
+//    qDebug() << __FUNCTION__;
     timer->stop();
     if(request_state == "receiveDanmu")
     {
@@ -159,7 +160,7 @@ void DouyuTcpSocket::keepAlive()
 
 void DouyuTcpSocket::stateChanged(QAbstractSocket::SocketState state)
 {
-    qDebug()<<state;
+//    qDebug() << state;
     QString datetime = QDateTime::currentDateTime().toString("MM-dd hh:mm:ss");
     QString roomid = danmu_rid;
     QString cur_state = "";
