@@ -41,18 +41,31 @@ bool XYBarrageScreen::forceTop()
     return mbForceTop;
 }
 
-void XYBarrageScreen::addItem(XYBarrageItem *item)
+void XYBarrageScreen::insertItem(XYBarrageItem *item, int pos)
 {
     if (mlistBarrageItems.size() > 1000) // 如果缓冲区存在太多的话就不要再添加，防止内存占用太多
     {
         delete item;
         return;
     }
-    mlistBarrageItems.append(item);
+    int insert_pos = miMaxBarrageNumber + pos;
+    if (mlistBarrageItems.size() > insert_pos)
+    {
+        mlistBarrageItems.insert(insert_pos, item);
+    }
+    else
+    {
+        mlistBarrageItems.append(item);
+    }
     if (miRefreshTimer == 0)
     {
         miRefreshTimer = startTimer(15);
     }
+}
+
+void XYBarrageScreen::addItem(XYBarrageItem *item)
+{
+    insertItem(item, mlistBarrageItems.size());
 }
 
 void XYBarrageScreen::delItem(XYBarrageItem *item)

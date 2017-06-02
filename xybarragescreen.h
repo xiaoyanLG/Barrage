@@ -14,6 +14,7 @@ public:
     bool forceTop();
 
 public slots:
+    void insertItem(XYBarrageItem *item, int pos = 0); // 字幕插队
     void addItem(XYBarrageItem *item);
     void delItem(XYBarrageItem *item);
     void setMaxBarrageNumber(int max);
