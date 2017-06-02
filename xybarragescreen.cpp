@@ -43,13 +43,16 @@ bool XYBarrageScreen::forceTop()
 
 void XYBarrageScreen::addItem(XYBarrageItem *item)
 {
-    if (mlistBarrageItems.size() > 1000)
+    if (mlistBarrageItems.size() > 1000) // 如果缓冲区存在太多的话就不要再添加，防止内存占用太多
     {
         delete item;
         return;
     }
     mlistBarrageItems.append(item);
-    miRefreshTimer = startTimer(15);
+    if (miRefreshTimer == 0)
+    {
+        miRefreshTimer = startTimer(15);
+    }
 }
 
 void XYBarrageScreen::delItem(XYBarrageItem *item)
@@ -60,6 +63,7 @@ void XYBarrageScreen::delItem(XYBarrageItem *item)
     {
         update();
         killTimer(miRefreshTimer);
+        miRefreshTimer = 0;
     }
 }
 
