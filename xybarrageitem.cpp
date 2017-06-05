@@ -2,6 +2,7 @@
 #include "xybarragescreen.h"
 #include <QPropertyAnimation>
 #include <QtMath>
+#include <QDebug>
 
 XYBarrageItem::XYBarrageItem(XYContents *contents,
                            int showTimes,
@@ -206,6 +207,10 @@ int XYBarrageItem::getRealContentsHeight()
 
 bool XYBarrageItem::isAdjust()
 {
+    if (!mbAdjust && mbStarted && lengthToPoint(moCurrentPos, moStartPos) > 5)
+    {
+        mbAdjust = true;
+    }
     return mbAdjust;
 }
 
