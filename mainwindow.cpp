@@ -71,7 +71,12 @@ XYBarrageItem *MainWindow::getItem(int time)
 {
     qsrand(QTime::currentTime().msecsTo(QTime(0, 0)) + time * 99);
     XYBarrageItem *item = new XYBarrageItem;
-    item->setShowTimes(ui->lineEdit_time->text().toInt()
+    int showTimes = ui->lineEdit_time->text().toInt();
+    if (ui->checkBox_time->isChecked())
+    {
+        showTimes = (qrand() % 20 + 5) * 1000;
+    }
+    item->setShowTimes(showTimes
                        , ui->lineEdit_counts->text().toInt());
 
     QTextFrame *frame = ui->textEdit->document()->rootFrame();
@@ -164,11 +169,29 @@ XYBarrageItem *MainWindow::getItem(int time)
 
     item->setContents(contentsHeader);
     QFont font = ui->fontComboBox->currentFont();
+    if (ui->checkBox_font->isChecked())
+    {
+        font = QFont(ui->fontComboBox->itemText(qrand() % ui->fontComboBox->count()));
+    }
     font.setPointSize(ui->spinBox_size->value());
+    if (ui->checkBox_size->isChecked())
+    {
+        font.setPointSize(qrand() % 40 + 10);
+    }
     item->setTextFont(font);
-    QColor color(ui->spinBox_R->value(),
-                 ui->spinBox_G->value(),
-                 ui->spinBox_B->value());
+    QColor color;
+    if (ui->checkBox_color->isChecked())
+    {
+        color = QColor(qrand() % 256,
+                       qrand() % 256,
+                       qrand() % 256);
+    }
+    else
+    {
+        color = QColor(ui->spinBox_R->value(),
+                       ui->spinBox_G->value(),
+                       ui->spinBox_B->value());
+    }
     item->setTextColor(color);
 
     int y = ui->lineEdit_Y->text().toInt();

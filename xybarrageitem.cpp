@@ -391,7 +391,7 @@ void XYBarrageItem::setStartPos(const QPoint &startPos)
     mfCurrentY = moStartPos.y();
     if (moEndPos.isNull())
     {
-        moEndPos = QPoint(- getContentsWidth()
+        moEndPos = QPoint(- getRealContentsWidth()
                           , moStartPos.y());
     }
     setShowTimes(miShowTimes, miLoopCounts);
@@ -402,7 +402,7 @@ void XYBarrageItem::setEndPos(const QPoint &endPos)
     moEndPos = endPos;
     if (moEndPos.isNull())
     {
-        moEndPos = QPoint(- getContentsWidth()
+        moEndPos = QPoint(- getRealContentsWidth()
                           , moStartPos.y());
     }
     setShowTimes(miShowTimes, miLoopCounts);
