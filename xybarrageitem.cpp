@@ -18,7 +18,8 @@ XYBarrageItem::XYBarrageItem(XYContents *contents,
     mopOpactiyAnimation = NULL;
     mbUseUserDrawPoints = false;
     mbStarted  = false;
-    mfOpactiy  = 0;
+    mbAdjust   = false;
+    mfOpactiy  = 1;
     miLoopCounts = 1;
     miBarrageWidth  = -1;
     miBarrageHeight = -1;
@@ -32,8 +33,12 @@ XYBarrageItem::~XYBarrageItem()
     deleteContents();
 }
 
-QPoint XYBarrageItem::getCurrentPos()
+QPoint XYBarrageItem::getCurrentPos(bool start)
 {
+    if (!start)
+    {
+        return moStartPos;
+    }
     if (mopMoveAnimation == NULL)
     {
         if (!mbEqualX)
@@ -52,6 +57,7 @@ QPoint XYBarrageItem::getCurrentPos()
         {
             mfCurrentY = moStartPos.y();
         }
+        mbStarted = true;
         return QPoint(mfCurrentX, mfCurrentY);
     }
     else
@@ -94,44 +100,7 @@ int XYBarrageItem::getContentsWidth()
     int width = this->miBarrageWidth;
     if (width == -1)
     {
-        width = 0;
-        XYContents *contents = this->mopContents;
-        int w = 0;
-        while (contents)
-        {
-            switch (contents->type)
-            {
-            case XYContents::TEXT:
-            {
-                QFontMetrics metrics(this->moTextFont);
-                w += metrics.width(contents->text) + 2;
-                break;
-            }
-            case XYContents::LF:
-                width = qMax(w, width);
-                w = 0;
-                break;
-            case XYContents::PIXMAP:
-                if (!contents->pixmap.isValid())
-                {
-                    QString filename = contents->pixmap.fileName();
-                    w += QPixmap(filename).width() + 1;
-                }
-                else if (contents->pixmap.state() != QMovie::Running)
-                {
-                    contents->pixmap.start();
-                    w += contents->pixmap.currentPixmap().width() + 1;
-                }
-                else
-                {
-                    w += contents->pixmap.currentPixmap().width() + 1;
-                }
-                break;
-            default:
-                break;
-            }
-            contents = contents->next;
-        }
+        width = getRealContentsWidth();
     }
 
     return width;
@@ -142,47 +111,116 @@ int XYBarrageItem::getContentsHeight()
     int height = this->miBarrageHeight;
     if (height == -1)
     {
-        height = 0;
-        XYContents *contents = this->mopContents;
-        int h = 0;
-        while (contents)
-        {
-            switch (contents->type)
-            {
-            case XYContents::TEXT:
-            {
-                QFontMetrics metrics(this->moTextFont);
-                h = qMax(h, metrics.height() + 2);
-                break;
-            }
-            case XYContents::LF:
-                height += h;
-                h = 0;
-                break;
-            case XYContents::PIXMAP:
-                if (!contents->pixmap.isValid())
-                {
-                    QString filename = contents->pixmap.fileName();
-                    h = qMax(h, QPixmap(filename).height() + 1);
-                }
-                else if (contents->pixmap.state() != QMovie::Running)
-                {
-                    contents->pixmap.start();
-                    h = qMax(h, contents->pixmap.currentPixmap().height() + 1);
-                }
-                else
-                {
-                    h = qMax(h, contents->pixmap.currentPixmap().height() + 1);
-                }
-                break;
-            default:
-                break;
-            }
-            contents = contents->next;
-        }
+        height = getRealContentsHeight();
     }
 
     return height;
+}
+
+int XYBarrageItem::getRealContentsWidth()
+{
+    int width = 0;
+    XYContents *contents = this->mopContents;
+    int w = 0;
+    while (contents)
+    {
+        switch (contents->type)
+        {
+        case XYContents::TEXT:
+        {
+            QFontMetrics metrics(this->moTextFont);
+            w += metrics.width(contents->text) + 2;
+            break;
+        }
+        case XYContents::LF:
+            width = qMax(w, width);
+            w = 0;
+            break;
+        case XYContents::PIXMAP:
+            if (!contents->pixmap.isValid())
+            {
+                QString filename = contents->pixmap.fileName();
+                w += QPixmap(filename).width() + 1;
+            }
+            else if (contents->pixmap.state() != QMovie::Running)
+            {
+                contents->pixmap.start();
+                w += contents->pixmap.currentPixmap().width() + 1;
+            }
+            else
+            {
+                w += contents->pixmap.currentPixmap().width() + 1;
+            }
+            break;
+        default:
+            break;
+        }
+        contents = contents->next;
+    }
+    return width;
+}
+
+int XYBarrageItem::getRealContentsHeight()
+{
+    int height = 0;
+    XYContents *contents = this->mopContents;
+    int h = 0;
+    while (contents)
+    {
+        switch (contents->type)
+        {
+        case XYContents::TEXT:
+        {
+            QFontMetrics metrics(this->moTextFont);
+            h = qMax(h, metrics.height() + 2);
+            break;
+        }
+        case XYContents::LF:
+            height += h;
+            h = 0;
+            break;
+        case XYContents::PIXMAP:
+            if (!contents->pixmap.isValid())
+            {
+                QString filename = contents->pixmap.fileName();
+                h = qMax(h, QPixmap(filename).height() + 1);
+            }
+            else if (contents->pixmap.state() != QMovie::Running)
+            {
+                contents->pixmap.start();
+                h = qMax(h, contents->pixmap.currentPixmap().height() + 1);
+            }
+            else
+            {
+                h = qMax(h, contents->pixmap.currentPixmap().height() + 1);
+            }
+            break;
+        default:
+            break;
+        }
+        contents = contents->next;
+    }
+
+    return height;
+}
+
+bool XYBarrageItem::isAdjust()
+{
+    return mbAdjust;
+}
+
+void XYBarrageItem::setAdjust(bool adjust)
+{
+    mbAdjust = adjust;
+}
+
+void XYBarrageItem::offsetY(int offset)
+{
+    if (moStartPos.y() == moEndPos.y())
+    {
+        moStartPos.setY(moStartPos.y() + offset);
+        moEndPos.setY(moEndPos.y() + offset);
+    }
 }
 
 void XYBarrageItem::setAnimation(const QEasingCurve &type)

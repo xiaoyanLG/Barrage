@@ -33,6 +33,7 @@ private:
                            qreal lineHeight,
                            qreal offsetX,
                            qreal offsetY);
+    bool rectCovered(const QRect &rect, const QList<QRect> &rects);
     explicit XYBarrageScreen(QWidget *parent = 0);
 
 private:

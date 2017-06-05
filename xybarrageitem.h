@@ -11,11 +11,16 @@
 class XYContents
 {
 public:
-    enum {NONE, TEXT, LF, PIXMAP};
+    enum TYPE{NONE, TEXT, LF, PIXMAP};
 
     XYContents()
     {
         type = NONE;
+        next = NULL;
+    }
+    XYContents(TYPE t)
+    {
+        type = t;
         next = NULL;
     }
     XYContents(const QString &text)
@@ -56,20 +61,28 @@ public:
                      int barrageWidth = -1);
     ~XYBarrageItem();
 
-    QPoint getCurrentPos();
+    QPoint getCurrentPos(bool start = true);
     qreal getCurrentOpacity();
 
     int getContentsWidth();
     int getContentsHeight();
 
-    // 使用特殊运动轨迹
-    void setAnimation(const QEasingCurve &type);
+    int getRealContentsWidth();
+    int getRealContentsHeight();
+
+    bool isAdjust();
+    void setAdjust(bool adjust);
+
+    void offsetY(int offset); // 平移，试图让弹幕不覆盖
 
     QPoint getPos() const;
     void setPos(const QPoint &pos);
 
     qreal getOpactiy() const;
     void setOpactiy(qreal opactiy);
+
+    // 使用特殊运动轨迹
+    void setAnimation(const QEasingCurve &type);
 
     bool isFinished();
 
@@ -88,10 +101,11 @@ public slots:
     void setDrawPoints(const QList<QPoint> &points);
     void setBackImage(const QMovie &image);
 
-private:
+public:
     QPropertyAnimation *mopMoveAnimation;
     QPropertyAnimation *mopOpactiyAnimation;
     qreal   mfOpactiy;
+    bool    mbAdjust;
     bool    mbStarted;
     bool    mbUseUserDrawPoints;
     QPoint  moStartPos;

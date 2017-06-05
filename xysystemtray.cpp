@@ -15,7 +15,9 @@ void test()
     XYBarrageScreen *screen = XYBarrageScreen::getScreen();
     for (int i = 0; i < 0; ++i)
     {
-        XYBarrageItem *item = new XYBarrageItem(new XYContents(QStringLiteral("我就是来打酱油的~")), 8000, "green");
+        XYContents *contents = new XYContents(QStringLiteral("我就是来打酱油的~"));
+        contents->next = new XYContents(XYContents::LF);
+        XYBarrageItem *item = new XYBarrageItem(contents, 8000, "green");
         QColor c(qrand()%256,qrand()%256,qrand()%256);
         QFont font("幼圆");
         font.setPointSize(10 + qrand()%40);

@@ -101,14 +101,37 @@ void XYBarrageScreen::paintEvent(QPaintEvent *event)
     QPainter painter;
     painter.begin(this);
 
+    QList<QRect> rects;
     for (int i = 0; i < mlistBarrageItems.size() && i < miMaxBarrageNumber; ++i)
     {
         XYBarrageItem *item = mlistBarrageItems.at(i);
         QFontMetrics metrics(item->moTextFont);
+        if (!rects.isEmpty() && !item->isAdjust()) // 防止弹幕覆盖处理
+        {
+            QPoint pos = item->getCurrentPos(false);
+            int limit = this->height();
+            while (rectCovered(QRect(pos.x(), pos.y(), 1, item->getRealContentsHeight()), rects) && limit)
+            {
+                if (pos.y() + 50 > this->height())
+                {
+                    item->offsetY(50 - this->height());
+                }
+                else
+                {
+                    item->offsetY(1);
+                }
+                pos = item->getCurrentPos(false);
+                item->setAdjust(true);
+                limit--;
+            }
+        }
+
         QPoint currentPos = item->getCurrentPos();
         painter.setPen(item->moTextColor);
         painter.setFont(item->moTextFont);
         painter.setOpacity(item->getCurrentOpacity());
+        rects.append(QRect(currentPos.x(), currentPos.y(),
+                           item->getRealContentsWidth(), item->getRealContentsHeight()));
         if (item->miBarrageWidth == -1)
         {
             item->miBarrageWidth = QApplication::desktop()->width();
@@ -273,4 +296,16 @@ void XYBarrageScreen::paintLineContents(QPainter &painter,
 
         contents = contents->next;
     }
+}
+
+bool XYBarrageScreen::rectCovered(const QRect &rect, const QList<QRect> &rects)
+{
+    for (int i = 0; i < rects.size(); ++i)
+    {
+        if (!rects.at(i).intersected(rect).isEmpty())
+        {
+            return true;
+        }
+    }
+    return false;
 }
