@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -324,6 +324,7 @@ void QtSingleApplication::activateWindow()
 {
     if (actWin) {
         actWin->setWindowState(actWin->windowState() & ~Qt::WindowMinimized);
+        actWin->showNormal();
         actWin->raise();
         actWin->activateWindow();
     }
