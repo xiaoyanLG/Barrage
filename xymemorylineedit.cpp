@@ -18,7 +18,7 @@ void XYMemoryLineEdit::mouseReleaseEvent(QMouseEvent *event)
 {
     if (selectedText().isEmpty())
     {
-        qSort(mlistMemoryString.begin(), mlistMemoryString.end());
+//        qSort(mlistMemoryString.begin(), mlistMemoryString.end());
         setCompleter(new QCompleter(mlistMemoryString));
         completer()->complete();
         completer()->popup();
