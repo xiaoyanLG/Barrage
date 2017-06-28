@@ -16,6 +16,7 @@
 #include "xyemoticonwidget.h"
 #include "xysignalbarragescreen.h"
 #include "xytooltips.h"
+#include "xymemorylineedit.h"
 
 // 斗鱼弹幕
 #include "danmuconfig.h"
@@ -358,6 +359,7 @@ void MainWindow::showChatMessage(QMap<QString,QString> messageMap)
 void MainWindow::start()
 {
     QString roomid = ui->roomID->text();
+    ui->roomID->saveCurrentText();
     QRegExp rx("[0-9a-zA-Z]+");
     rx.setMinimal(false);
     if(rx.exactMatch(roomid))

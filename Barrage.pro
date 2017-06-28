@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     DouYuDanMu/douyutcpsocket.cpp \
     DouYuDanMu/jsonparse.cpp \
     DouYuDanMu/networkaccess.cpp \
-    DouYuDanMu/stringgenerator.cpp
+    DouYuDanMu/stringgenerator.cpp \
+    xymemorylineedit.cpp
 
 HEADERS  += mainwindow.h \
     qtsingle/qtlocalpeer.h \
@@ -68,7 +69,8 @@ HEADERS  += mainwindow.h \
     DouYuDanMu/jsonparse.h \
     DouYuDanMu/networkaccess.h \
     DouYuDanMu/stringgenerator.h \
-    version.h
+    version.h \
+    xymemorylineedit.h
 
 FORMS += \
     mainwindow.ui
