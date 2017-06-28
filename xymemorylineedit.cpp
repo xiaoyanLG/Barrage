@@ -8,7 +8,7 @@ XYMemoryLineEdit::XYMemoryLineEdit(QWidget *parent)
 
 void XYMemoryLineEdit::saveCurrentText()
 {
-    if (mlistMemoryString.size() < 10)
+    if (mlistMemoryString.size() < 10 && !mlistMemoryString.contains(text()))
     {
         mlistMemoryString.prepend(text());
     }
