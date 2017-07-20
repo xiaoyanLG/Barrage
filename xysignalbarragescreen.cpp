@@ -14,8 +14,9 @@ XYSignalBarrageScreen::XYSignalBarrageScreen(XYBarrageItem *item, QWidget *paren
     : XYMovableWidget(parent), XYMouseMonitor()
 {
     this->setWindowFlags(Qt::FramelessWindowHint
-                         | Qt::WindowStaysOnTopHint
-                         | Qt::WindowType_Mask);
+                   | Qt::WindowStaysOnTopHint
+                   | Qt::Tool
+                   | Qt::WindowDoesNotAcceptFocus);
     this->setAttribute(Qt::WA_TranslucentBackground);
 
     allSignalScreens.append(this);

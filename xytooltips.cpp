@@ -3,23 +3,22 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QTimer>
-#include <Windows.h>
+#include <QTimerEvent>
 
 XYToolTips *XYToolTips::mopInstance = NULL;
 XYToolTips::XYToolTips(QWidget *parent)
     : XYBorderShadowWidget(parent), XYMouseMonitor()
 {
     this->setWindowFlags(Qt::FramelessWindowHint
-                         | Qt::WindowStaysOnTopHint
-                         | Qt::WindowType_Mask);
+                   | Qt::WindowStaysOnTopHint
+                   | Qt::Tool
+                   | Qt::WindowDoesNotAcceptFocus);
 
-    moTimer.setInterval(8000);
+    mopParent = NULL;
+    miMonitorTimer = startTimer(50);
+    moTimer.setInterval(5000);
     moTimer.setSingleShot(true);
     connect(&moTimer, SIGNAL(timeout()), this, SLOT(close()));
-    setFocus();
-
-    SetWindowLong((HWND)winId(), GWL_EXSTYLE, GetWindowLong((HWND)winId(), GWL_EXSTYLE) |
-                   WS_EX_TRANSPARENT | WS_EX_LAYERED);
 }
 
 XYToolTips::~XYToolTips()
@@ -36,19 +35,23 @@ XYToolTips *XYToolTips::getInstance()
     return mopInstance;
 }
 
-void XYToolTips::showToolTips(const QString &tooltips)
+void XYToolTips::showToolTips(const QString &tooltips, QWidget *parent)
 {
     QPoint pos = QCursor::pos();
-    showToolTips(tooltips, pos);
+    showToolTips(tooltips, pos, parent);
 }
 
-void XYToolTips::showToolTips(const QString &tooltips, const QPoint &pos)
+void XYToolTips::showToolTips(const QString &tooltips, const QPoint &pos, QWidget *parent)
 {
     if (tooltips.trimmed().isEmpty())
     {
         return;
     }
     XYToolTips *toolwd = getInstance();
+    if (parent)
+    {
+        toolwd->mopParent = parent;
+    }
     if (!toolwd->isHidden())
     {
         toolwd->close();
@@ -75,6 +78,7 @@ void XYToolTips::showToolTips(const QString &tooltips, const QPoint &pos)
 
 bool XYToolTips::close()
 {
+    mopParent = NULL;
     moTimer.stop();
     return QWidget::close();
 }
@@ -96,13 +100,19 @@ void XYToolTips::paintEvent(QPaintEvent *event)
                      msToolTips);
 }
 
-void XYToolTips::focusOutEvent(QFocusEvent *event)
+void XYToolTips::clicked(const QPoint &point)
 {
     close();
 }
 
-void XYToolTips::clicked(const QPoint &point)
+void XYToolTips::timerEvent(QTimerEvent *event)
 {
-    focusOutEvent(NULL);
+    if (event->timerId() == miMonitorTimer)
+    {
+        if (mopParent && !mopParent->isVisible())
+        {
+            close();
+        }
+    }
 }
 

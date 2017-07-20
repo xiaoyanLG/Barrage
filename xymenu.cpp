@@ -6,7 +6,6 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QVBoxLayout>
-#include <Windows.h>
 #include <QPainter>
 
 XYMenu *XYMenu::mopLastMenu = NULL;
@@ -14,8 +13,9 @@ XYMenu::XYMenu(QWidget *parent)
     : XYBorderShadowWidget(parent), XYMouseMonitor()
 {
     this->setWindowFlags(Qt::FramelessWindowHint
-                         | Qt::WindowStaysOnTopHint
-                         | Qt::WindowType_Mask);
+                   | Qt::WindowStaysOnTopHint
+                   | Qt::Tool
+                   | Qt::WindowDoesNotAcceptFocus);
 
     moBackImage = QPixmap(":/sourceImage/backImage");
     mopEventLoop = new QEventLoop(this);
@@ -24,7 +24,6 @@ XYMenu::XYMenu(QWidget *parent)
     mopParentMenu = NULL;
     mopMainLayout->setSpacing(0);
 
-    raise();
     if (!mlistWidgets.contains(this))
     {
         mlistWidgets.append(this);
@@ -93,14 +92,6 @@ int XYMenu::exec()
     return mopEventLoop->exec();
 }
 
-void XYMenu::raise()
-{
-    QWidget::raise();
-    QWidget::setFocus();
-    // 这里直接使用QT的setfocus函数无效，改用系统API（windows）
-    SetFocus((HWND)this->winId());
-}
-
 void XYMenu::updateCheckedMenu()
 {
     for (int i = 0; i < mlistWidgets.size(); ++i)
@@ -157,12 +148,6 @@ bool XYMenu::close(bool closeParent)
     if (mopLastMenu == this)
     {
         mopLastMenu = NULL;
-    }
-
-    // 先把焦点给父菜单
-    if (mopParentMenu)
-    {
-        mopParentMenu->raise();
     }
 
     // 最后判断是否需要关闭父菜单
@@ -226,45 +211,6 @@ void XYMenu::focusOutEvent(QFocusEvent *event)
     }
 }
 
-void XYMenu::leaveEvent(QEvent *event)
-{
-//    // 处理离开窗口的逻辑，如果需要就打开
-//    bool b_close = true;
-//    if (mopParentMenu)
-//    {
-//        XYMenu *menu = mopParentMenu;
-//        do
-//        {
-//            if (menu->rect().contains(QCursor::pos() - menu->pos()))
-//            {
-//                b_close = false;
-//                break;
-//            }
-//            menu = menu->mopParentMenu;
-//        }while (menu);
-//    }
-
-//    auto it = mlistMenus.begin();
-//    while (it != mlistMenus.end())
-//    {
-//        XYMenu *menu = it.value();
-//        if (menu->rect().contains(QCursor::pos() - menu->pos()))
-//        {
-//            b_close = false;
-//            break;
-//        }
-//        it++;
-//    }
-
-//    if (b_close)
-//    {
-//        close(true);
-//    }
-//    event->accept();
-
-    QWidget::leaveEvent(event);
-}
-
 void XYMenu::clicked(const QPoint &point)
 {
     bool bclose = true;
@@ -291,10 +237,6 @@ void XYMenu::execMenu2(XYMenuStyle *style)
         {
             style->mopMenu->exec(this);
         }
-        else
-        {
-            style->mopMenu->raise();
-        }
     }
     else
     {
@@ -308,7 +250,6 @@ void XYMenu::execMenu2(XYMenuStyle *style)
             }
             it++;
         }
-        raise();
     }
 }
 

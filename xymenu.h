@@ -26,7 +26,6 @@ public:
 
 public slots:
     int exec();
-    void raise();
     void updateCheckedMenu();
     int exec(XYMenu *parent);
     bool close(bool closeParent = false);
@@ -39,7 +38,6 @@ public slots:
 protected:
     void paintEvent(QPaintEvent *event);
     void focusOutEvent(QFocusEvent *event);
-    void leaveEvent(QEvent *event);
     void clicked(const QPoint &point);
 
 private:

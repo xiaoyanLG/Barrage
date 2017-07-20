@@ -11,23 +11,25 @@ class XYToolTips : public XYBorderShadowWidget, public XYMouseMonitor
 public:
     ~XYToolTips();
     static XYToolTips *getInstance();
-    static void showToolTips(const QString &tooltips);
-    static void showToolTips(const QString &tooltips, const QPoint &pos);
+    static void showToolTips(const QString &tooltips, QWidget *parent = NULL);
+    static void showToolTips(const QString &tooltips, const QPoint &pos, QWidget *parent = NULL);
 
 public slots:
     bool close();
 
 protected:
     void paintEvent(QPaintEvent *event);
-    void focusOutEvent(QFocusEvent *event);
     void clicked(const QPoint &point);
+    void timerEvent(QTimerEvent *event);
 
 private:
     explicit XYToolTips(QWidget *parent = 0);
     static XYToolTips* mopInstance;
 
-    QTimer  moTimer;
-    QString msToolTips;
+    int      miMonitorTimer;
+    QWidget *mopParent;
+    QTimer   moTimer;
+    QString  msToolTips;
 };
 
 #endif // XYTOOLTIPS_H

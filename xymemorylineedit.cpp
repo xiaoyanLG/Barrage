@@ -21,7 +21,6 @@ void XYMemoryLineEdit::mouseReleaseEvent(QMouseEvent *event)
 //        qSort(mlistMemoryString.begin(), mlistMemoryString.end());
         setCompleter(new QCompleter(mlistMemoryString));
         completer()->complete();
-        completer()->popup();
     }
     QLineEdit::mouseReleaseEvent(event);
 }
