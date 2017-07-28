@@ -17,6 +17,7 @@
 #include "xysignalbarragescreen.h"
 #include "xytooltips.h"
 #include "xymemorylineedit.h"
+#include "XYInput/xyinput.h"
 
 // 斗鱼弹幕
 #include "danmuconfig.h"
@@ -47,6 +48,12 @@ MainWindow::MainWindow(QWidget *parent) :
     insertImage(":/Gif/60");
     resize(1000, 700);
     mopInstance = this;
+
+    // 初始化输入法词库
+    QDir::setCurrent(qApp->applicationDirPath());
+    XYInput::getInstance()->initInputBase("chineseBase/chinese.db");
+
+    ui->textEdit->installEventFilter(XYInput::getInstance());
 
     // 斗鱼弹幕
     network_access = new NetworkAccess();
