@@ -10,7 +10,7 @@
 
 XYMenu *XYMenu::mopLastMenu = NULL;
 XYMenu::XYMenu(QWidget *parent)
-    : XYBorderShadowWidget(parent), XYMouseMonitor()
+    : XYBorderShadowWidget(parent), XYMouseMonitor(false)
 {
     this->setWindowFlags(Qt::FramelessWindowHint
                    | Qt::WindowStaysOnTopHint

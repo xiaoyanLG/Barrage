@@ -9,7 +9,7 @@ class XYMouseMonitor
 {
     enum CLICKTYPE {DOWN, UP, MOVE, WHEEL};
 public:
-    explicit XYMouseMonitor();
+    explicit XYMouseMonitor(bool acceptManage = true);
     virtual ~XYMouseMonitor();
     static void startMouseMonitor();
     static void stopMouseMonitor();

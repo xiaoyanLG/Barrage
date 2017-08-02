@@ -4,9 +4,12 @@
 static HHOOK hhkMouse = NULL;			// 鼠标钩子句柄
 QList<XYMouseMonitor *>  XYMouseMonitor::mlistAllWidget;
 
-XYMouseMonitor::XYMouseMonitor()
+XYMouseMonitor::XYMouseMonitor(bool acceptManage)
 {
-    mlistAllWidget.append(this);
+    if (acceptManage)
+    {
+        mlistAllWidget.append(this);
+    }
     startMouseMonitor();
 }
 
