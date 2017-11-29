@@ -197,7 +197,7 @@ void XYMenu::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     painter.drawPixmap(10, 10, width() - 20, height() - 20, moBackImage);
-
+    raise();
 }
 
 void XYMenu::focusOutEvent(QFocusEvent *event)
