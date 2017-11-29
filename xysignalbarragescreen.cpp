@@ -48,9 +48,9 @@ XYSignalBarrageScreen::~XYSignalBarrageScreen()
 
 void XYSignalBarrageScreen::deleteAllAnimations()
 {
-    while (!mlistAllWidget.isEmpty())
+    while (!allSignalScreens.isEmpty())
     {
-        delete mlistAllWidget.at(0);
+        delete allSignalScreens.at(0);
     }
 }
 
